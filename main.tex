@@ -1,0 +1,138 @@
+% ======================================================================
+%  Compile with XeLaTeX (required for the Arabic text on the page de
+%  garde and for using Times New Roman as a system font):
+%
+%       xelatex main.tex
+%       biber main
+%       xelatex main.tex
+%       xelatex main.tex      (run again so citations/ToC/LoF are correct)
+%
+% ======================================================================
+
+\documentclass[12pt, a4paper]{report}
+
+\usepackage[a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm,
+            includefoot, footskip=1.25cm]{geometry}
+
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes}
+
+\usepackage{polyglossia}
+\setmainlanguage{english}
+\setotherlanguage{french}
+\setotherlanguage{arabic}
+\newfontfamily\arabicfont[Script=Arabic]{Amiri}
+
+
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{parskip}          % 6pt space after paragraphs
+\setlength{\parindent}{1.25cm} % retrait en début de paragraphe
+
+
+\usepackage{titlesec}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\titlespacing*{\chapter}{0pt}{0pt}{12pt}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{12pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{12pt}{6pt}
+
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{listings}
+\lstdefinelanguage{SPARQL}{
+  morekeywords={SELECT,DISTINCT,WHERE,FILTER,OPTIONAL,UNION,ORDER,BY,
+    DESC,ASC,LIMIT,GROUP,HAVING,COUNT,COALESCE,AS,NOT,EXISTS,
+    BIND,CONSTRUCT,INSERT,VALUES,PREFIX,STRLEN,STR,STRSTARTS,IN,
+    FILTER,GROUP_CONCAT},
+  sensitive=false,
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+\lstset{
+  basicstyle=\small\ttfamily,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  captionpos=b,
+  language=SPARQL,
+}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[R]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+\usepackage[citestyle=numeric, bibstyle=numeric, sorting=none, backend=biber]{biblatex}
+\addbibresource{references.bib}
+
+\begin{document}
+
+\pagestyle{empty}
+\input{page_de_garde.tex}
+
+\pagestyle{fancy}
+\pagenumbering{roman}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\input{abstract.tex}
+
+\noindent\textbf{Keywords:} Enterprise Architecture; ArchiMate; Knowledge Graphs; RDF/OWL; Large Language Models.
+
+\tableofcontents
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\input{abbreviations.tex}
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+Enterprise architecture models offer an integrated and unified representation of the different layers of an organization's activity, thereby facilitating decision-making. These layers structure the vision of business processes, application architecture, technical infrastructure, as well as the interactions between them.
+
+Modeling languages that allow for the mapping of this architecture are widely used, such as ArchiMate, the standard language of the Open Group. However, to fully exploit these models and automate their analysis via complex queries, a transition to Knowledge Graphs (KG) is being adopted \parencite{glaser2022model}. KGs are currently deployed on a large scale, ranging from the massive KGs of web giants (Google, Facebook, or Amazon) to more targeted enterprise KGs.
+
+Tools like the EAKG Toolkit \parencite{glaser2022toolkit} allow ArchiMate models to be transformed into a KG based on the Property Graph model (supported by the Neo4j DBMS). Another KG standard, originating from the Semantic Web, is the RDF graph model (supported by other DBMSs such as GraphDB).
+
+The objective of this project is to:
+\begin{enumerate}
+    \item Provide an algorithm allowing the translation of an ArchiMate model according to the RDF standard. Examples of ArchiMate models are provided as input (in XML). The algorithm, inspired by prior work \parencite{glaser2022model}, must provide the RDF representation of these models. The user will thus be able to export the resulting RDF KG to a DBMS of their choice (GraphDB in our case).
+    \item Propose queries to analyze ArchiMate models through the KG. The queries will be formulated in SPARQL, the standard language for querying the RDF model, similar to SQL for querying a relational model.
+    \item The use of an LLM can be considered to allow querying the obtained KG in natural language---English---(translating the natural language query into the SPARQL language).
+\end{enumerate}
+
+\input{chapitre1.tex}
+\input{chapitre2.tex}
+\input{chapitre3.tex}
+\input{chapitre4.tex}
+
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+\input{conclusion.tex}
+
+\printbibliography[title={References}, heading=bibintoc]
+
+\end{document}

@@ -1,0 +1,123 @@
+% ======================================================================
+% chapitre4.tex - LLM-based natural-language evaluation
+% \input from main.tex - do not compile standalone.
+% ======================================================================
+
+\chapter{Natural-Language Access to the Enterprise Architecture Knowledge Graph}
+\label{chap:ai-evaluation}
+
+\section{Objective and Motivation}
+\label{sec:ai-objective}
+
+The third objective of this work is to evaluate whether Enterprise Architecture models can be effectively explored and queried through natural-language interaction with a Large Language Model (LLM), and to what extent the representation format of the model---raw, translated, or made queryable---affects the quality of the answers produced.
+
+While the previous objectives focused on defining a translation methodology from ArchiMate models to a Semantic Web ontology (RDF/OWL) and enriching the resulting Enterprise Architecture Knowledge Graph (EAKG) with structural and domain-specific knowledge such as EA smells, this objective addresses a practical question: does this translation effort improve an LLM's ability to reason about an EA model compared with simply providing the model in its native exchange format? Furthermore, does giving the LLM active access to the graph, rather than a static dump of it, change its performance?
+
+To answer this, four experimental conditions were designed by varying two independent dimensions:
+\begin{itemize}
+    \item \textbf{Representation}: the raw ArchiMate Exchange Format model versus the translated EAKG ontology.
+    \item \textbf{Access mode}: the full model provided statically as context versus the model made available as a live, queryable resource through a tool.
+\end{itemize}
+
+This comparison isolates the respective contributions of the translation methodology and interactive graph access rather than conflating the two.
+
+\section{Test Setup}
+\label{sec:ai-setup}
+
+The four conditions were as follows:
+\begin{enumerate}
+    \item \textbf{Raw XML (static context).} The ArchiMate Exchange Format model, exported directly from the modeling tool, was provided in full as context. No translation or ontology mapping was applied.
+    \item \textbf{Raw JSON (static context).} The same exchange-format model, converted to an equivalent JSON representation, was provided in full. This condition isolates XML versus JSON serialization while keeping the underlying information identical.
+    \item \textbf{Translated EAKG ontology (static context).} The model was passed through the translation pipeline defined in this work, producing the EAKG in RDF/OWL. The resulting Turtle graph was provided as static context together with a general explanation of its namespaces, element and relationship mapping, property mapping, and layer and category resolution. No ArchiSurance-specific information was included in that explanation.
+    \item \textbf{GraphDB live access (interactive).} The translated EAKG was loaded into GraphDB. The LLM received a SPARQL-query tool and the same schema explanation as in Test 3, and had to retrieve the information needed for each answer.
+\end{enumerate}
+
+Figure~\ref{fig:tests-setup} summarizes the four experimental conditions and the distinction between static context and interactive graph access.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tests_setup.png}
+    \caption{Experimental setup for the four LLM evaluation conditions}
+    \label{fig:tests-setup}
+\end{figure}
+
+\section{Evaluation Methodology}
+\label{sec:ai-methodology}
+
+Answers produced under each condition were scored using a dedicated LLM-based grading procedure applied uniformly across all four tests.
+
+\subsection{Ground Truth}
+\label{subsec:ai-ground-truth}
+
+The original ArchiSurance model in its native exchange format served as the sole authority for element identity, type, layer, and relationship existence, type, and direction. The accompanying Open Group ArchiSurance documentation was used only to resolve ambiguity and clarify intended semantics, never as a source of exact identifiers.
+
+Although the grader was also an LLM, its role differed from that of the models under evaluation. The generation LLM in each test performed open-ended interpretation of a model it had to understand and reason about. The grading LLM was given the complete ground-truth model and performed a comparison task: it checked whether the elements, relationships, and directions cited in an answer matched what the ground truth explicitly contained. It was therefore verifying specific claims rather than independently reconstructing architectural knowledge.
+
+\subsection{Grading Dimensions and Procedure}
+\label{subsec:ai-grading}
+
+Each answer was scored independently along three axes:
+\begin{itemize}
+    \item \textbf{Correctness} (0.00--1.00): how completely and accurately the answer matched what the ground truth supported, including penalties for missing elements, wrong relationship directions, and vague answers.
+    \item \textbf{Grounding} (0.00--1.00): whether every substantive claim was traceable to a specific element or relationship identifier in the model.
+    \item \textbf{Hallucination} (true/false): whether the answer contained an invented element, relationship, identifier, or type not present in the ground truth.
+\end{itemize}
+
+The final score was derived as a weighted combination of Correctness and Grounding using weights of 0.7 and 0.3. When hallucination was detected, the result was capped at 0.25. A correct refusal was scored 1.0 directly because it contained no specific claim to ground; if it also involved a hallucination, the same 0.25 cap applied.
+
+For each question, the grader first determined the correct answer from the ground-truth model, then compared the generated answer with that reference. Special handling covered correct refusals, partial or missing identifiers, directional errors, and, for the interactive condition, answers that described a query strategy without reporting the instance-level results retrieved from the graph. Failed runs caused by tool or API errors were excluded from scoring and logged separately rather than penalized as incorrect answers.
+
+The grading prompts for Tests 1--3 and Test 4 shared the same rubric, dimensions, score formula, and core edge-case rules. The Test 4 version additionally specified how to handle tool or API failures and query-strategy descriptions, which do not arise in the static-context conditions.
+
+While the scoring was automated, targeted manual validation was performed on edge cases and ambiguous responses to ensure the integrity of the final scores.
+
+\section{Results}
+\label{sec:ai-results}
+
+Each test was run twice on the same 26 questions. Answers were scored from 0 to 1, with correctness and grounding graded separately and hallucination flags recorded for each answer. Table~\ref{tab:ai-summary} summarizes the results; the complete question-level grid is provided in Annex~C.
+
+\begin{table}[H]
+\centering
+\caption{Summary of the LLM evaluation results}
+\label{tab:ai-summary}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Test} & \textbf{Run 1} & \textbf{Run 2} & \textbf{Mean final score} & \textbf{Mean correctness} & \textbf{Mean grounding} & \textbf{Hallucinations} \\
+\midrule
+1 XML (static) & 0.70 & 0.90 & 0.80 & 0.83 & 0.86 & 7/52 (13\%) \\
+2 JSON (static) & 0.74 & 0.88 & 0.81 & 0.81 & 0.91 & 4/52 (8\%) \\
+3 TTL (static) & 0.58 & 0.75 & 0.67 & 0.72 & 0.82 & 12/52 (23\%) \\
+4 GraphDB & 0.89 & 0.91 & 0.90 & 0.95 & 0.73 & 1/51 (2\%) \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Test 4 has 51 scored answers because one answer in Run 1 failed with a 503 error and was excluded. GraphDB access obtained the highest score and was the most stable across runs. The static Turtle dump obtained the lowest score, while XML and JSON were close to each other between the two extremes.
+
+\section{Synthesis and Limitations}
+\label{sec:ai-synthesis}
+
+\subsection{Main Findings}
+\label{subsec:ai-findings}
+
+\textbf{Access mode mattered more than format.} Tests 3 and 4 used the same graph and schema explanation, yet GraphDB scored about 0.23 higher (0.67 versus 0.90) and produced no zero-score answers. The ontology was more useful when queried than when read as a static text dump.
+
+\textbf{XML and JSON performed similarly.} Their mean scores were close (0.80 versus 0.81). JSON had better grounding (0.91 versus 0.86) and fewer hallucination flags (4 versus 7 of 52), whereas XML had slightly higher correctness (0.83 versus 0.81). With only two runs per condition, these differences indicate at most a mild advantage for JSON.
+
+\textbf{Static conditions were less stable.} Run 2 exceeded Run 1 by 0.20 for XML, 0.14 for JSON, and 0.17 for TTL, whereas GraphDB changed by only 0.02. This pattern is suggestive but not conclusive.
+
+\textbf{Failure modes differed by condition.} XML and JSON produced wrong relationship targets, wrong element types, and refusals for information present in the model. TTL mainly produced relation errors, including reversed directions and invented paths, as well as corrupted identifiers. GraphDB produced almost no direction or identifier errors; its only hallucination was a relation between real elements that was not present in the graph.
+
+\textbf{Correctness and grounding should be read separately.} GraphDB had the highest correctness (0.95) but the lowest grounding (0.73). Several answers described the query strategy rather than tracing the instance identifiers behind the result, which reduced their grounding scores even when the final answer was correct.
+
+\subsection{Limitations}
+\label{subsec:ai-limitations}
+
+Question 1 was graded inconsistently across files. When the exact answer was absent, some answers refused and offered a close alternative, while the rubric did not clearly specify how to treat that behavior. The question was retained in the averages, and excluding it did not change the ranking.
+
+The potential bias introduced by the LLM-based grader, as well as the scope of the manual verification, is discussed further in the Conclusion.
+
+Finally, two runs per condition are insufficient for significance testing. Differences smaller than approximately 0.05 should therefore not be interpreted as reliable performance differences.
