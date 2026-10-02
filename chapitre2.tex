@@ -19,7 +19,7 @@ This chapter describes the concrete implementation of the translation methodolog
     \label{fig:translator-enrichment}
 \end{figure}
 
-The translator (\texttt{archimate\_to\_eakg.py}) takes an ArchiMate Model Exchange File Format (v3.1) XML file as input and produces an Enterprise Architecture Knowledge Graph serialized as a Turtle (\texttt{.ttl}) file. The program is invoked from the command line:
+The translator (\texttt{archimate\_to\_eakg.py}) takes an ArchiMate Model Exchange File Format (v3.1) XML file as input and produces an Enterprise Architecture Knowledge Graph serialized as a Turtle\parencite{turtle} (\texttt{.ttl}) file. The program is invoked from the command line:
 
 \begin{verbatim}
 python archimate_to_eakg.py <input.xml> [output.ttl]
@@ -27,7 +27,7 @@ python archimate_to_eakg.py <input.xml> [output.ttl]
 
 If no output path is given, the result is written to \texttt{eakg\_output.ttl} in the same directory as the input file.
 
-The translation pipeline is organized into three sequential passes over the XML document, each implementing one of the core translation rules defined in Chapter~\ref{chap:translation}. Before those passes execute, the program initializes an RDF graph pre-loaded with the base ontology pattern (\texttt{eakg\_base\_pattern.ttl}), which provides the ArchiMate class hierarchy and base property definitions.
+The translation pipeline is organized into three sequential passes over the XML document, each implementing one of the core translation rules defined in \autoref{chap:translation}.
 
 % ------------------------------------------------------------------
 \subsection{Namespaces and Lookup Tables}
