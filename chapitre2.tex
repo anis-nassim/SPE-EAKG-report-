@@ -82,12 +82,10 @@ The second pass converts each XML element into a typed named individual, emits m
 The third pass turns each relationship identifier into an object-property predicate, links it to its ArchiMate relationship class, and emits the source-to-target triple plus any metadata and property values.
 
 % ------------------------------------------------------------------
-\subsection{Pipeline Orchestration}
-\label{subsec:pipeline}
+\subsection{Knowledge Graph Deployment and Usage}
+\label{subsec:kg-deployment-usage}
 
-The main entry point ties the pipeline together. It begins by loading the base ontology pattern from the Turtle file \texttt{eakg\_base\_pattern.ttl}, which pre-populates the graph with the generic construction pattern and base property declaration (\texttt{archimate:Property}). The ArchiMate class hierarchy is supplied separately by loading the ontology into the triplestore via its PURL (Section~\ref{sec:enrichment}). The entry point then parses the input XML, executes the three passes in order, and serializes the resulting graph to the output Turtle file with all namespace prefixes bound for clean, human-readable output.
-
-The sequential ordering of the passes is deliberate: Pass~1 must complete before Passes~2 and~3 because both element and relationship processing depend on the property definition dictionary built during Pass~1.
+The resulting KG then loaded in the triple store (importing the turtle file in GraphDB), and also import the Archimate Ontology which includes definition and hierarchy of used classes/predicate. Then the graph can be visualized or queried using SPARQL.
 
 % ------------------------------------------------------------------
 \section{Enrichment: Ontology Loading and Smell Tagging}
