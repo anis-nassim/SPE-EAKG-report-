@@ -91,12 +91,12 @@ The resulting KG then loaded in the triple store (importing the turtle file in G
 \section{Enrichment: Ontology Loading and Smell Tagging}
 \label{sec:enrichment}
 
-Enrichment is performed directly in the triplestore rather than through offline merge scripts. It proceeds in two steps.
+Enrichment is performed directly in the triplestore after loading the created graph.
 
 \subsection{Ontology Loading}
 \label{subsec:ontology-loading}
 
-The ArchiMate ontology and the EA smell ontology are loaded into the triplestore via their persistent URLs (\texttt{http://purl.org/eakg/archimate} and \texttt{http://purl.org/eakg/smells}), alongside the translated model. This supplies the \texttt{rdfs:subClassOf} and \texttt{rdfs:subPropertyOf} hierarchy required by the reasoning-dependent queries in Chapter~\ref{chap:queries}. No offline merge script is needed.
+The enrichment ontology EA smell ontology in our case is loaded into the triplestore via its persistent URL \texttt{http://purl.org/eakg/smells}), alongside the translated model. This allow using resources and predicate defined in the enrichment ontology.
 
 \subsection{EA Smell Tagging}
 \label{subsec:smell-tagging}
@@ -108,7 +108,7 @@ Once the ontologies and model are loaded and RDFS reasoning is active, EA smells
     \item A \textbf{tagging \texttt{INSERT}} query materializes a \texttt{smells:hasSmell} triple on each affected resource, using the same detection logic as its \texttt{WHERE} clause.
 \end{enumerate}
 
-The detection queries are unchanged from the analytical queries presented in Chapter~\ref{chap:queries}. The tagging queries are presented alongside them. Once tagged, affected resources can be retrieved with a single generic query by specifying the smell URI, and tags can be selectively reset without affecting other enrichment results.
+The detection queries are unchanged from the analytical queries presented in Chapter~\ref{chap:queries}. The tagging queries are presented alongside them. Once tagged, affected resources can be retrieved with a single generic query by specifying the smell URI, and tags can be selectively reset.
 
 % ------------------------------------------------------------------
 \section{Tools and Technology Stack}
