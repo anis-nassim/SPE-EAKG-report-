@@ -6,7 +6,7 @@
 \chapter{Implementation}
 \label{chap:implementation}
 
-This chapter describes the concrete implementation of the translation methodology presented in Chapter~\ref{chap:translation}. The translator (\texttt{archimate\_to\_eakg.py}) converts an ArchiMate Model Exchange File Format XML document into an RDF/OWL knowledge graph. Enrichment is performed directly in the triplestore by loading the ontologies via their persistent URLs and running SPARQL-based smell tagging. The entire stack is built on open standards and open-source tooling.
+This chapter describes the concrete implementation of the translation methodology presented in \autoref{chap:translation}. The translator (\texttt{archimate\_to\_eakg.py}) converts an ArchiMate Model Exchange File Format XML document into an RDF/OWL knowledge graph. Enrichment is performed directly in the triplestore (GraphDB) by loading the ontologies and inserting necessary triples using SPARQL queries. The entire stack is built on open standards and open-source tooling. A YARRRML implementation of the translation rules was provided as a contribution by Amel BELMAKSENE to the work.
 
 % ------------------------------------------------------------------
 \section{Architecture of the Translator}
