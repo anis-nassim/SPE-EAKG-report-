@@ -41,10 +41,31 @@ Our equivalent mapping from ArchiMate models to RDF Knowledge Graphs is formaliz
 Following the approach presented in \parencite{glaser2022model}, we defined a set of translation rules for transforming an ArchiMate model into an RDF Knowledge Graph, mapping each concrete element, relationship, and property to its corresponding representation in the KG. The detailed mapping is presented in Section~\ref{sec:rules}. Section~\ref{sec:ontology} introduces the OWL ontology we designed to represent ArchiMate semantics in the resulting KG.
 
 % ------------------------------------------------------------------
-\section{The Base Ontology}
+\section{Archimate Ontology}
 \label{sec:ontology}
 
-The ArchiMate framework organizes concepts along two dimensions: \emph{layers} (Strategy, Business, Application, Technology, Physical, and Implementation \& Migration) and \emph{aspects} (Passive Structure, Behavior, Active Structure, and Motivation), as defined by the ArchiMate standard \parencite{opengroup2023archimate}. Our ontology maps the ArchiMate metamodel to OWL classes; its class hierarchy mirrors the metamodel's Layer/Aspect/Concept structure. To illustrate how the ontology classifies architecture elements, Figure~\ref{fig:businessactor-example} shows an example for \texttt{BusinessActor}.
+The ArchiMate specification defines a \emph{model} as a collection of \emph{concepts}, where a concept is either an \emph{element} or a \emph{relationship} \parencite{opengroup2023archimate}. These concepts are organized into a type system that captures the semantics of the ArchiMate language and serves as the basis for our ontology. The top-level hierarchy of concepts is shown in \autoref{fig:concepts-top-level-hierarchy}, along with its corresponding representation in our ontology in \autoref{fig:concepts-top-level-hierarchy-ontology}.
+
+The full Ontology is available at \url{https://purl.org/eakg/archimate}\parencite{eakg-archimate-ontology}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\linewidth]{concepts-top-level-hierarchy.png}
+  \caption{Top-Level Hierarchy of Archimate Concepts}
+  \label{fig:concepts-top-level-hierarchy}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{concepts-top-level-hierarchy-ontology.png}
+  \caption{Ontology Representation of Top-Level Hierarchy of Archimate Concepts}
+  \label{fig:concepts-top-level-hierarchy-ontology}
+\end{figure}
+
+\subsection{Elements in the Ontology}
+\label{subsec:ontology-elements}
+
+\emph{Elements} are organized along two dimensions: \emph{layers} (Strategy, Business, Application, Technology, Physical, and Implementation \& Migration) and \emph{aspects} (Passive Structure, Behavior, Active Structure, and Motivation), as defined by the ArchiMate standard \parencite{opengroup2023archimate}. Our ontology maps the ArchiMate metamodel to OWL classes; its class hierarchy mirrors the metamodel's Layer/Aspect/Concept structure. To illustrate how the ontology classifies architecture elements, Figure~\ref{fig:businessactor-example} shows an example for \texttt{BusinessActor}.
 
 \begin{figure}[H]
   \centering
