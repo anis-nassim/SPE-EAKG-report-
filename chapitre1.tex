@@ -109,13 +109,21 @@ In the Knowledge Graph Creation stage, the relevant information is extracted fro
 \subsection{Phase 2: Knowledge Graph Enrichment (Semantic Layering)}
 \label{subsec:phase2}
 
-The Enrichment Phase expands the base graph with the semantic hierarchy and domain-specific analytical tags. It proceeds in two steps.
+The Enrichment Phase allows expanding the created graph with more information that can't be represented with ArchiMate concepts alone to give more value to EA model. Enrichment is performed by defining a specific ontology or reusing a predefined one to add additional resources and triples to the graph. This approach allows the resulting KG to be easily extended and customized according to user needs.
 
-First, the ArchiMate and EA smell ontologies are loaded into the triplestore directly via their persistent URLs (\texttt{http://purl.org/eakg/archimate} and \texttt{http://purl.org/eakg/smells}), alongside the translated model. This supplies the \texttt{rdfs:subClassOf} and \texttt{rdfs:subPropertyOf} hierarchy that the base graph does not contain---for example, connecting \texttt{archimate:BusinessActor} through \texttt{archimate:ActiveStructureElement} up to \texttt{archimate:BusinessLayer}. When an RDFS ruleset is active, the triplestore expands these hierarchies automatically. No offline merge script is needed.
+To demonstrate the enrichment phase, we propose the EA Smell Ontology, which defines seven types of EA smells and a predicate, \texttt{hasSmell}, used to associate affected resources with the corresponding smell types. The ontology is represented in \autoref{fig:smell-ontology}.
 
-Second, EA smells are detected and tagged via SPARQL. For each of the seven smells defined in the smell ontology, a detection \texttt{SELECT} query identifies the affected resources, and a tagging \texttt{INSERT} query materializes a \texttt{smells:hasSmell} triple on each one. The detection queries and their tagging counterparts are presented in Chapter~\ref{chap:queries}.
+EA smells are detected and tagged using SPARQL. For each of the seven smells defined in the ontology, a detection \texttt{SELECT} query identifies the affected resources, while a corresponding tagging \texttt{INSERT} query materializes a \texttt{smells} triple for each affected resource. The detection queries and their corresponding tagging queries are presented in \autoref{chap:queries}.
 
-This differs from the enrichment approach of \parencite{glaser2022model}, where computed graph metrics and EA smell labels are materialized by an external pipeline. Our approach performs enrichment directly in the triplestore via SPARQL updates, avoiding the need for a separate enrichment script. Structural graph analytics such as centrality scores remain a potential future extension.
+This differs from the enrichment approach of \parencite{glaser2022model}, where computed graph metrics and EA smell labels are materialized by an external pipeline. Our approach performs enrichment directly in the triplestore via SPARQL updates, avoiding the need for a separate enrichment script. Structural graph analytic such as centrality scores remain a potential future extension.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{smell-ontology.png
+}
+  \caption{Smell Ontology Representation}
+  \label{fig:smell-ontology}
+\end{figure}
 
 % ------------------------------------------------------------------
 \section{Core Translation Rules}
