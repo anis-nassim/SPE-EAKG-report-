@@ -104,9 +104,7 @@ To ensure modularity and extensibility, this translation algorithm formally adop
 \subsection{Phase 1: Knowledge Graph Creation (Base Graph Construction)}
 \label{subsec:phase1}
 
-In the Knowledge Graph Creation stage, the relevant information is extracted from the EA model to establish the initial semantic topology of the EAKG. Property definitions are registered first, followed by the creation and typing of element resources and the connection of those resources through relationship predicates. The base graph is grounded using \texttt{rdf:type} and \texttt{rdfs:subPropertyOf}, defining the ArchiMate entities present and preparing the graph for enrichment. The exact representation of each resource, relationship, and property is given in Section~\ref{sec:rules}.
-
-The canonical ArchiMate schema ontology is published at the persistent URL \texttt{http://purl.org/eakg/archimate}, which also serves as the Ontology IRI. The PURL redirects to the file's current hosting location, so identifiers stay stable even if the hosting changes. The methodology enforces a strict separation between \emph{static schema} (the published ontology, containing class hierarchies, relationship types, and schema-fixed attribute declarations) and \emph{dynamic output} (the translator, which emits only model-specific instance data such as per-relation predicates and user-defined properties).
+In the Knowledge Graph Creation stage, the relevant information is extracted from the EA model to create its RDF/EAKG representation. Property definitions are registered first, followed by the creation and typing of element resources and the connection of these resources through relationship predicates. The resulting graph is structured using \texttt{rdf:type} and \texttt{rdfs:subPropertyOf}, which define the types of ArchiMate entities and relationships represented in the graph based on our ontology. The exact representation of each resource, relationship, and property is given in \autoref{sec:rules}.
 
 \subsection{Phase 2: Knowledge Graph Enrichment (Semantic Layering)}
 \label{subsec:phase2}
