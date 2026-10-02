@@ -117,10 +117,19 @@ The detection queries are unchanged from the analytical queries presented in Cha
 The implementation relies on the following tools and technologies:
 
 \begin{itemize}
-    \item \textbf{Python 3} as the programming language for both the translator and the enrichment module.
+    \item \textbf{Python 3} as the programming language for the translator.
     \item \textbf{rdflib} (Python library) for constructing, manipulating, and serializing RDF graphs \parencite{rdflib2024}. It provides native support for Turtle, N-Triples, and other RDF serialization formats, as well as namespace management and literal typing.
     \item \textbf{xml.etree.ElementTree} (Python standard library) for parsing the ArchiMate Model Exchange File Format XML documents.
     \item \textbf{GraphDB} (Ontotext) as the target triplestore for deploying the resulting EAKG \parencite{ontotext2024graphdb}. GraphDB supports SPARQL 1.1 querying and RDFS reasoning, which enables the sub-property inference chains relied upon by our translation rules.
     \item \textbf{SPARQL 1.1} as the query language for analyzing the deployed knowledge graph.
     \item \textbf{RDFS reasoning} for inferring implicit relationships through the \texttt{rdfs:subPropertyOf} and \texttt{rdfs:subClassOf} hierarchies defined in the base ontology. This allows queries to match, for example, all \texttt{archimate:DependencyRelationship} instances without enumerating every concrete sub-property.
 \end{itemize}
+
+% ------------------------------------------------------------------
+
+\section{YARRRML implementation of the Translation Rules}
+\label{sec:yarrrml}
+
+We had the chance to collaborate with Amel BELMAKSENE, who provided a YARRRML implementation of our translation rules. This implementation can be executed on an ArchiMate model represented in ArchiMate Exchange Format in JSON to produce the target EAKG.
+
+YARRRML is a human-readable, text-based representation for declarative generation rules. Therefore, the YARRRML implementation provides a declarative representation of our translation rules, which makes them easier to inspect and communicate, and separates the translation rules from their implementation. They can also be processed using existing RML tooling.
