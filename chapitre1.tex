@@ -74,10 +74,18 @@ The full Ontology is available at \url{https://purl.org/eakg/archimate}\parencit
   \label{fig:businessactor-example}
 \end{figure}
 
-\subsection{Relationships in the Ontology}
+\subsection{Relationships and Relationships Connectors in the Ontology}
 \label{subsec:ontology-relationships}
 
-Relationships are modeled as \texttt{owl:ObjectProperty} instances, which connect elements directly. They are organized into four base properties: \texttt{structuralRelationship}, \texttt{dependencyRelationship}, \texttt{dynamicRelationship}, and \texttt{otherRelationship}. Relationship connectors (AND, OR) are modeled as a class that is instantiated to create a junction, then assigned the type ``and'' or ``or''; elements participate in the junction through the appropriate relationship.
+Relationships are modeled as \texttt{owl:ObjectProperty} instances, which connect elements directly. They are organized into four base properties: \texttt{structuralRelationship}, \texttt{dependencyRelationship}, \texttt{dynamicRelationship}, and \texttt{otherRelationship}. Relationship connectors (AND, OR) are modeled as a class that is instantiated to create a junction, then assigned the type ``and'' or ``or''; elements participate in the junction through the appropriate relationship. The relationships hierarchy is represented in \autoref{fig:ontology-relationships-hierarchy}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{ontology-relationships-hierarchy.png
+}
+  \caption{Archimate Ontology Relationships Hierarchy}
+  \label{fig:ontology-relationships-hierarchy}
+\end{figure}
 
 % ------------------------------------------------------------------
 \section{ArchiMate Model Exchange Format}
