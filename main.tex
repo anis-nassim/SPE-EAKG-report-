@@ -47,6 +47,7 @@
 \usepackage{tabularx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{listings}
+\usepackage[htt]{hyphenat} % allow break lines inside \texttt
 \lstdefinelanguage{SPARQL}{
   morekeywords={SELECT,DISTINCT,WHERE,FILTER,OPTIONAL,UNION,ORDER,BY,
     DESC,ASC,LIMIT,GROUP,HAVING,COUNT,COALESCE,AS,NOT,EXISTS,
@@ -120,7 +121,7 @@ Tools like the EAKG Toolkit \parencite{glaser2022toolkit} allow ArchiMate models
 The objective of this project is to:
 
 \begin{enumerate}
-    \item Provide an algorithm allowing the translation of an ArchiMate model to a RDF knowledge graph. ArchiMate models are provided as input with Archimate Exchange Format\parentcite{archimateExc}. The algorithm, inspired by prior work \parencite{glaser2022model}, must provide the RDF representation of these models. The user will thus be able to import the resulting RDF KG to a DBMS of their choice (GraphDB in our case).
+    \item Provide an algorithm allowing the translation of an ArchiMate model to a RDF knowledge graph. ArchiMate models are provided as input with Archimate Exchange Format\parencite{archimateExc}. The algorithm, inspired by prior work \parencite{glaser2022model}, must provide the RDF representation of these models. The user will thus be able to import the resulting RDF KG to a DBMS of their choice (GraphDB in our case).
     \item Propose queries to exploit and analyze ArchiMate models through the KG. The queries will be formulated in SPARQL, the standard language for querying the RDF model, similar to SQL for querying a relational model.
     \item The use of an LLM to allow querying the obtained KG in natural language---English---(translating the natural language query into the SPARQL) to answer user questions.
 \end{enumerate}
