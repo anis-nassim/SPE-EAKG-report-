@@ -154,7 +154,7 @@ Abstract details of elements and relations are mapped to properties of the KG me
 
 \begin{itemize}
     \item A property key becomes an \texttt{owl:DatatypeProperty} with an XSD range and an \texttt{rdfs:subPropertyOf} link to \texttt{archimate:Property}, even when it has no assigned value. Values are emitted as direct subject--predicate--literal triples, so repeated values remain distinct objects without intermediate nodes.
-    \item \textbf{Schema-fixed attributes.} Certain relationship types carry semantic metadata as fixed XML attributes rather than \texttt{<property>} child elements---specifically \texttt{accessType} (on Access), \texttt{isDirected} (on Association), and \texttt{modifier} (on Influence). The schema declaration (type, range, super-property under \texttt{archimate:Property}) lives in the static ontology; concrete values are emitted by the translator.
+    \item \textbf{Schema-fixed attributes.} Certain relationship types carry semantic metadata as fixed XML attributes rather than \texttt{<property>} child elements---specifically \texttt{accessType} (on Access), \texttt{isDirected} (on Association), and \texttt{modifier} (on Influence). These properties are defined in the ArchiMate Ontology and concrete values are emitted by the translator.
 \end{itemize}
 
 \begin{lstlisting}[basicstyle=\small\ttfamily,
