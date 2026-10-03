@@ -36,7 +36,7 @@ WHERE {
 
 All subsequent queries in this chapter and in the Annex assume the same prefixes unless otherwise noted.
 
-Dependency chains can also be traversed in the opposite direction. For example, the query below lists what depends on a given component (here, ``PaaS Services''):
+Dependency chains can also be traversed in the opposite direction. For example, another query lists what depends on a given component (e.g. ``PaaS Services''):
 
 \textit{(full query: see Annex, Listing A.1)}
 
@@ -66,7 +66,7 @@ ex:id-47094 & ex:id-47501 & Front Office \\
 \subsection{Orphan Element Detection}
 \label{subsec:orphan-elements}
 
-A useful model quality check is to find elements that have no relationship with any other element---orphan nodes that may have been forgotten during modeling:
+A useful model-quality check is to identify elements that have no relationship with any other element---orphan nodes that may have been forgotten during modeling:
 
 \begin{lstlisting}[caption={Detect orphan elements (no incoming or outgoing relationships)}]
 SELECT ?element ?elementName
@@ -90,7 +90,7 @@ The query returns 15 orphan elements in the ArchiSurance model, including Produc
 \subsection{Most Connected Elements}
 \label{subsec:most-connected}
 
-Sorting elements by their total number of relationships (incoming and outgoing) helps identify the most central components of the architecture:
+Sorting elements by their total number of relationships (incoming and outgoing) helps identify the elements with the highest number of relationships in the architecture:
 
 \begin{lstlisting}[caption={Rank elements by total number of relationships}]
 SELECT ?element ?elementName
@@ -140,7 +140,7 @@ ex:id-46369 & Serve Customers & 14 \\
 \end{table}
 
 % ------------------------------------------------------------------
-\subsection{Layer Listings}
+\subsection{Elements by ArchiMate Layer}
 \label{subsec:layer-listings}
 
 The following query lists all elements together with their ArchiMate layer classification, exploiting the ontology's class hierarchy:
