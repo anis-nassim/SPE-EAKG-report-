@@ -38,7 +38,7 @@ All subsequent queries in this chapter and in the Annex assume the same prefixes
 
 Dependency chains can also be traversed in the opposite direction. For example, another query lists what depends on a given component (e.g. ``PaaS Services''):
 
-\textit{(full query: see Annex, Listing A.1)}
+\textit{(full query: see \autoref{lst:annex-reverse-dep-query})}
 
 \begin{table}[H]
 \centering
@@ -145,11 +145,11 @@ ex:id-46369 & Serve Customers & 14 \\
 
 The following query lists all elements together with their ArchiMate layer classification, exploiting the ontology's class hierarchy:
 
-\textit{(full query: see Annex, Listing A.2)}
+\textit{(full query: see \autoref{lst:annex-layer-element-query})}
 
 Elements can also be listed by the relationships between layers. The cross-layer count below reports the four Application-to-Business type pairs returned by the query.
 
-\textit{(full query: see Annex, Listing A.3)}
+\textit{(full query: see \autoref{lst:annex-inter-layer-connections-query})}
 
 \begin{table}[H]
 \centering
@@ -179,7 +179,7 @@ In this section, we present three CONSTRUCT SPARQL queries which can be used in 
 
 This query shows the inter-layer relationships between different types of elements across two layers. For example, this query displays links between the Business and Application layers.
 
-\textit{(full query: see Annex, Listing A.8)}
+\textit{(full query: see \autoref{lst:annex-connection-business-application-query})}
 
 \begin{figure}[H]
   \centering
@@ -193,7 +193,7 @@ This query shows the inter-layer relationships between different types of elemen
 
 This is an expansion query that allows an element to be used as a starting point; by expanding each element, we can follow the dependency chain and visualize it.
 
-\textit{(full query: see Annex, Listing A.8)}
+\textit{(full query: see \autoref{lst:dep-chain-expantion-query})}
 
 \begin{figure}[H]
   \centering
@@ -207,7 +207,7 @@ This is an expansion query that allows an element to be used as a starting point
 
 This query visualizes the relationships between elements of the same layer and colors the nodes based on their type.
 
-\textit{(full query: see Annex, Listing A.8)}
+\textit{(full query: see autoref{lst:relations-tech-layer-query})}
 
 \begin{figure}[H]
   \centering
@@ -267,9 +267,9 @@ By transforming the ArchiMate model into a knowledge graph, we can automate the 
 Three queries extract the gap classification directly from the knowledge graph:
 
 \begin{enumerate}
-    \item \textbf{ABBs present in both architectures (Kept).} This query returns the elements aggregated by both the baseline and target plateaus. \textit{(full query: see Annex, Listing A.4)}
-    \item \textbf{ABBs present only in the baseline (candidates for elimination).} This query identifies elements that belong to the baseline plateau but are absent from the target plateau. \textit{(full query: see Annex, Listing A.5)}
-    \item \textbf{ABBs present only in the target (new gaps).} This query identifies elements introduced in the target plateau that do not exist in the baseline plateau. \textit{(full query: see Annex, Listing A.6)}
+    \item \textbf{ABBs present in both architectures (Kept).} This query returns the elements aggregated by both the baseline and target plateaus. \textit{(full query: see \autoref{lst:annex-kept-elements-query})}
+    \item \textbf{ABBs present only in the baseline (candidates for elimination).} This query identifies elements that belong to the baseline plateau but are absent from the target plateau. \textit{(full query: see \autoref{lst:annex-eliminated-elements-query})}
+    \item \textbf{ABBs present only in the target (new gaps).} This query identifies elements introduced in the target plateau that do not exist in the baseline plateau. \textit{(full query: see \autoref{lst:annex-new-elements-query})}
 \end{enumerate}
 
 \subsubsection{Enrichment Ontology: Gap Analysis and Evolution Modeling}
@@ -308,7 +308,7 @@ Transformation and
 
 can be expressed as the following SPARQL equivalent:
 
-\textit{(full query: see Annex, Listing A.8)}
+\textit{(full query: see \autoref{lst:annex-equi-dl-tansformation})}
 
 The full ontology is available online on \url{http://purl.org/eakg/gap_evolution}.
 % ------------------------------------------------------------------
@@ -354,7 +354,7 @@ ex:id-46304 & ArchiSurance Back Office Suite & New \\
 
 After reviewing each element, we mark it with the appropriate property by inserting triples with the ``Gap'' node. The following SPARQL Update query shows how decisions are recorded:
 
-\textit{(full queries: see Annex, Listing A.7)}
+\textit{(full queries: see \autoref{lst:annex-gap-classify-query} and \autoref{lst:annex-gap-mark-decisions-query})}
 
 % ==================================================================
 \section{EA Smells Detection Queries}
@@ -372,9 +372,9 @@ Enterprise Architecture Smells are recurring patterns in an EA model that indica
 
 \textbf{The Detection Logic:} We target the \texttt{archimate:DependencyRelationship} hierarchy and scan the graph globally to match unbroken chains of these dependency edges. If traversing that chain eventually leads right back to the exact same starting node, a cycle is detected.
 
-\textit{(full query: see Annex, Listing A.9)}
+\textit{(full query: see \autoref{lst:annex-detect-cyclic-query})}
 
-Each element in the cycle is tagged with \texttt{smells:CyclicDependency}. \textit{(tagging query: see Annex, Listing A.14)}
+Each element in the cycle is tagged with \texttt{smells:CyclicDependency}. \textit{(tagging query: see \autoref{lst:annex-tag-cyclic-dep-query})}
 
 \noindent\textbf{Shared Persistency}\par
 
@@ -382,9 +382,9 @@ Each element in the cycle is tagged with \texttt{smells:CyclicDependency}. \text
 
 \textbf{The Detection Logic:} We isolate \texttt{archimate:PassiveStructureElement} nodes, which represent data. We then look for instances where two or more distinct elements from the \texttt{archimate:BusinessLayer} have an \texttt{archimate:Access} edge pointing directly to that exact same data node.
 
-\textit{(full query: see Annex, Listing A.10)}
+\textit{(full query: see \autoref{lst:annex-detect-shared-persistency-query})}
 
-The shared data node is tagged with \texttt{smells:SharedPersistency}. \textit{(tagging query: see Annex, Listing A.15)}
+The shared data node is tagged with \texttt{smells:SharedPersistency}. \textit{(tagging query: see \autoref{lst:annex-shared-persistency-query})}
 
 \noindent\textbf{Strict Layers Violation}\par
 
@@ -414,7 +414,7 @@ WHERE {
 }
 \end{lstlisting}
 
-The offending relationship edge is tagged with \texttt{smells:StrictLayersViolation}. \textit{(tagging query: see Annex, Listing A.16)}
+The offending relationship edge is tagged with \texttt{smells:StrictLayersViolation}. \textit{(tagging query: see \autoref{lst:annex-tag-strict-layers-violation-query})}
 
 % ------------------------------------------------------------------
 \subsection{Service and Interaction Smells}
@@ -449,7 +449,7 @@ GROUP BY ?service ?label
 HAVING (COUNT(DISTINCT ?connectedElement) >= 10)
 \end{lstlisting}
 
-The overly communicative service node is tagged with \texttt{smells:ChattyService}. \textit{(tagging query: see Annex, Listing A.17)}
+The overly communicative service node is tagged with \texttt{smells:ChattyService}. \textit{(tagging query: see \autoref{lst:annex-tag-chatty-service-nodes-query})}
 
 \noindent\textbf{Data Service}\par
 
@@ -457,9 +457,9 @@ The overly communicative service node is tagged with \texttt{smells:ChattyServic
 
 \textbf{The Detection Logic:} We isolate service nodes and evaluate their \emph{outgoing} relationships (where the service acts as the source). We identify services that have outgoing edges pointing to \texttt{archimate:PassiveStructureElement} nodes, but apply a strict filter to ensure they have \emph{zero} outgoing edges pointing to any \texttt{archimate:ActiveStructureElement} or \texttt{archimate:BehaviorElement}. Incoming edges (other components calling the service) are expected and are ignored by this filter.
 
-\textit{(full query: see Annex, Listing A.11)}
+\textit{(full query: see \autoref{lst:annex-detect-data-only-query})}
 
-The data-only service node is tagged with \texttt{smells:DataService}. \textit{(tagging query: see Annex, Listing A.18)}
+The data-only service node is tagged with \texttt{smells:DataService}. \textit{(tagging query: see \autoref{lst:annex-tag-data-only-query})}
 
 % ------------------------------------------------------------------
 \subsection{Model Quality Smells}
@@ -471,9 +471,9 @@ The data-only service node is tagged with \texttt{smells:DataService}. \textit{(
 
 \textbf{The Detection Logic:} We compare the \texttt{rdfs:label} (the name) across the graph. If we find two or more distinct nodes (different IRIs) sharing the exact same label, they are flagged as duplicates.
 
-\textit{(full query: see Annex, Listing A.12)}
+\textit{(full query: see \autoref{lst:annex-detect-dup-element-query})}
 
-Each element sharing its label with at least one other element is tagged with \texttt{smells:Duplication}. \textit{(tagging query: see Annex, Listing A.19)}
+Each element sharing its label with at least one other element is tagged with \texttt{smells:Duplication}. \textit{(tagging query: see \autoref{lst:annex-tag-duplicate-query})}
 
 \noindent\textbf{Unnecessary Documentation}\par
 
@@ -481,9 +481,9 @@ Each element sharing its label with at least one other element is tagged with \t
 
 \textbf{The Detection Logic:} We extract the \texttt{rdfs:comment} string literal for every element in the graph, calculate the character length of that string, and flag comments that exceed a specific character limit (e.g., 400 characters).
 
-\textit{(full query: see Annex, Listing A.13)}
+\textit{(full query: see \autoref{lst:annex-detect-long-doc})}
 
-Any model resource exceeding the character limit is tagged with \texttt{smells:UnnecessaryDocumentation}. \textit{(tagging query: see Annex, Listing A.20)}
+Any model resource exceeding the character limit is tagged with \texttt{smells:UnnecessaryDocumentation}. \textit{(tagging query: see \autoref{lst:annex-tag-unecessary-long-doc-query})}
 
 \subsection{Utility Functions}
 \label{subsec:utility-functions}
@@ -498,5 +498,4 @@ SELECT ?element ?label WHERE {
 }
 \end{lstlisting}
 
-A corresponding query for resetting a selected smell tag is provided in Annex,
-Listing A.21.
+A corresponding query for resetting a selected smell tag is provided in \autoref{lst:annex-reset-smell}
