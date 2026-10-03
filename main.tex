@@ -136,6 +136,25 @@ The objective of this project is to:
 \addcontentsline{toc}{chapter}{Conclusion}
 \input{conclusion.tex}
 
+% =========================================================
+% Annexes
+\appendix
+\fontsize{10pt}{12pt}\selectfont
+\renewcommand{\appendixname}{Annex}
+\chapter*{ANNEXES}
+\addcontentsline{toc}{chapter}{ANNEXES}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}\chapter{Supplementary Material}
+\input{annexe/annexeA.tex}
+\chapter{Implementation Detail}
+\label{chap:annexeB}
+\input{annexe/annexeB.tex}
+\chapter{Detailed AI Evaluation Results}
+\input{annexe/annexeC.tex}
+% ===========================================
+% Refrences
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\fontsize{12pt}{14.5pt}\selectfont
+\clearpage
 \printbibliography[title={References}, heading=bibintoc]
 
 \end{document}
