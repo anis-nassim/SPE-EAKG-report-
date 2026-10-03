@@ -406,6 +406,63 @@ DELETE WHERE {
 }
 \end{lstlisting}
 
+\section*{A.8 --- Visualization Queries}
+
+\begin{lstlisting}[caption={Connection between Business and Application Layer}]
+CONSTRUCT {
+    ?layer1 ?rel1 ?layer2 .
+    ?layer2 ?rel2 ?layer1 .
+}
+WHERE {
+    # Select Classes
+    ?layer1 rdfs:subClassOf archimate:ApplicationLayer .
+    BIND(archimate:ApplicationLayer AS ?layer1Class)
+    ?layer2 rdfs:subClassOf archimate:BusinessLayer .
+    BIND(archimate:BusinessLayer AS ?layer2Class)
+    ?a a ?layer1 .
+    ?b a ?layer2 .
+{
+        ?a a ?layer1 .
+        ?b a ?layer2 .
+        ?a ?rel1 ?b .
+    }
+    UNION
+    {
+        ?a a ?layer1 .
+        ?b a ?layer2 .
+        ?b ?rel2 ?a .
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Dependency Chain Expansion Query}]
+CONSTRUCT {
+    ?node ?rel ?target .
+}
+WHERE {
+    ?node ?rel ?target .
+    ?rel rdfs:subPropertyOf ?parentRel .
+    VALUES ?parentRel { 
+        archimate:DependencyRelationship 
+        archimate:StructuralRelationship 
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Relations between Technology Layer Elements}]
+CONSTRUCT {
+    # 1. Draw the actual relationships (edges) between the nodes
+    ?src ?rel ?target . 
+    ?src rdfs:label ?srName .
+    ?target rdfs:label ?targetName .
+}
+WHERE {
+    ?src a archimate:TechnologyLayer ;
+          ?rel ?target .
+    ?target a archimate:TechnologyLayer .
+}
+\end{lstlisting}
+
 \chapter*{Annex B: Implementation Detail}
 This annex records the implementation details omitted from Chapter~2 for readability.
 
