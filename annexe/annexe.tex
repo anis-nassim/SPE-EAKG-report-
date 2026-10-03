@@ -116,9 +116,7 @@ GROUP BY ?src ?target
 \begin{lstlisting}[caption={ABBs present in both architectures (Kept)}]
 # Newly introduced prefix for this listing.
 PREFIX ex: <http://www.example.org/eakg#>
-
 # Case-study IDs: baseline = ex:id-47396; target = ex:id-46339.
-
 SELECT ?shared_element
 WHERE {
   ex:id-47396 archimate:Aggregation ?shared_element .
@@ -129,7 +127,6 @@ WHERE {
 \begin{lstlisting}[caption={ABBs present only in the baseline (candidates for elimination)}]
 # Prefix used for the gap-analysis resources and properties.
 PREFIX ex: <http://www.example.org/eakg#>
-
 SELECT ?baseline_element
 WHERE {
   ex:id-47396 archimate:Aggregation ?baseline_element .
@@ -142,13 +139,47 @@ WHERE {
 \begin{lstlisting}[caption={ABBs present only in the target (new gaps)}]
 # Prefix used for the gap-analysis resources and properties.
 PREFIX ex: <http://www.example.org/eakg#>
-
 SELECT ?target_element
 WHERE {
   ex:id-46339 archimate:Aggregation ?target_element .
   FILTER NOT EXISTS {
     ex:id-47396 archimate:Aggregation ?target_element .
   }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Classify elements as Kept, Eliminated, or New in one query}]
+# Newly introduced prefix for this query.
+PREFIX ex: <http://www.example.org/eakg#>
+
+SELECT ?ABB ?label ?state
+WHERE {
+    BIND(ex:id-46339 AS ?target)
+    BIND(ex:id-47396 AS ?baseline)
+    {
+        ?baseline archimate:Aggregation ?ABB .
+        ?target archimate:Aggregation ?ABB .
+        ?ABB rdfs:label ?label .
+        BIND("Kept" AS ?state)
+    }
+    UNION
+    {
+        ?baseline archimate:Aggregation ?ABB .
+        FILTER NOT EXISTS {
+            ?target archimate:Aggregation ?ABB .
+        }
+        ?ABB rdfs:label ?label .
+        BIND("Eliminated" AS ?state)
+    }
+    UNION
+    {
+        ?target archimate:Aggregation ?ABB .
+        FILTER NOT EXISTS {
+            ?baseline archimate:Aggregation ?ABB .
+        }
+        ?ABB rdfs:label ?label .
+        BIND("New" AS ?state)
+    }
 }
 \end{lstlisting}
 
