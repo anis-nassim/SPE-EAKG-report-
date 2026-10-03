@@ -11,7 +11,7 @@
 
 The third objective of this work is to evaluate whether Enterprise Architecture models can be effectively explored and queried through natural-language interaction with a Large Language Model (LLM), and to what extent the representation format of the model---raw, translated, or made queryable---affects the quality of the answers produced.
 
-While the previous objectives focused on defining a translation methodology from ArchiMate models to a Semantic Web ontology (RDF/OWL) and enriching the resulting Enterprise Architecture Knowledge Graph (EAKG) with structural and domain-specific knowledge such as EA smells, this objective addresses a practical question: does this translation effort improve an LLM's ability to reason about an EA model compared with simply providing the model in its native exchange format? Furthermore, does giving the LLM active access to the graph, rather than a static dump of it, change its performance?
+While the previous objectives focused on defining a translation methodology from ArchiMate models to a RDF Knowledge Graph and enriching the resulting Enterprise Architecture Knowledge Graph (EAKG) with structural and domain-specific knowledge such as EA smells, this objective addresses a practical question: does this translation effort improve an LLM's ability to reason about an EA model compared with simply providing the model in its native exchange format? Furthermore, does giving the LLM active access to the graph, rather than a static dump of it, change its performance?
 
 To answer this, four experimental conditions were designed by varying two independent dimensions:
 \begin{itemize}
@@ -74,7 +74,7 @@ While the scoring was automated, targeted manual validation was performed on edg
 \section{Results}
 \label{sec:ai-results}
 
-Each test was run twice on the same 26 questions. Answers were scored from 0 to 1, with correctness and grounding graded separately and hallucination flags recorded for each answer. Table~\ref{tab:ai-summary} summarizes the results; the complete question-level grid is provided in Annex~C.
+Each test was run twice on the same 26 questions. Answers were scored from 0 to 1, with correctness and grounding graded separately and hallucination flags recorded for each answer. Table~\ref{tab:ai-summary} summarizes the results; the complete question-level grid is provided in \autoref{tab:ai-question-results}.
 
 \begin{table}[H]
 \centering
