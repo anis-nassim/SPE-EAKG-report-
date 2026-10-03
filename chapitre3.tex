@@ -168,6 +168,54 @@ archimate:ApplicationProcess & archimate:BusinessProcess & 1 \\
 \end{tabularx}
 \end{table}
 
+% ------------------------------------------------------------------
+\section{Visualization Queries}
+\label{sec:visualization-queries}
+
+In this section, we present three CONSTRUCT SPARQL queries which can be used in the GraphDB visualization tool to have customizable views of the graph for analysis.
+
+\subsection{Connection Between Layers}
+\label{subsec:layers-connections}
+
+This query shows the inter-layer relationships between different types of elements across two layers. For example, this query displays links between the Business and Application layers.
+
+\textit{(full query: see Annex, Listing A.8)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{business-application-relations.png}
+  \caption{Query result: connections between the Business and Application layers}
+  \label{fig:business-application-relations}
+\end{figure}
+
+\subsection{Dependency Chain Expansion Query}
+\label{subsec:dep-chain-expansion}
+
+This is an expansion query that allows an element to be used as a starting point; by expanding each element, we can follow the dependency chain and visualize it.
+
+\textit{(full query: see Annex, Listing A.8)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{dependency-chain.png}
+  \caption{PaaS services dependency-chain expansion query}
+  \label{fig:paas-services-dep-chain}
+\end{figure}
+
+\subsection{Intra-Layer Connections Query}
+\label{subsec:intra-layer-connections}
+
+This query visualizes the relationships between elements of the same layer and colors the nodes based on their type.
+
+\textit{(full query: see Annex, Listing A.8)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{technology-layer-connections.png}
+  \caption{Technology Layer Connections}
+  \label{fig:technology-layer-connections}
+\end{figure}
+
 % ==================================================================
 \section{Gap Analysis}
 \label{sec:gap-analysis}
