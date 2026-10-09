@@ -1,0 +1,472 @@
+This independent annex contains supplementary material for the report. The first section provides complete SPARQL queries moved from Chapter~3; additional annex sections may be added here without changing the document's structure. The prefixes declared in the first Chapter~3 listing are assumed unless a listing explicitly introduces a new prefix.
+
+\section{Exploratory Queries}
+\label{sec:annex-a1}
+
+\begin{lstlisting}[
+	caption={Reverse dependency chain: elements depending on a given component},
+	label={lst:annex-reverse-dep-query}
+]
+SELECT DISTINCT ?component ?service ?serviceName
+WHERE {
+  ?component rdfs:label "PaaS Services"@en .
+  ?component (archimate:DependencyRelationship
+             |archimate:StructuralRelationship)+ ?service .
+  ?service rdf:type archimate:Element ;
+           rdfs:label ?serviceName .
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={List elements with their ArchiMate layer},
+	label={lst:annex-layer-element-query}
+]
+# Newly introduced prefix for this listing.
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?s ?n ?layer
+WHERE {
+  ?s a archimate:Element, ?layer .
+  ?layer a archimate:Layer .
+  ?s rdfs:label ?n .
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Cross-layer relationship counts: Application to Business},
+	label={lst:annex-inter-layer-connections-query}
+]
+SELECT ?src ?target (COUNT(?rel) AS ?counter)
+WHERE {
+  ?src rdfs:subClassOf archimate:ApplicationLayer .
+  ?target rdfs:subClassOf archimate:BusinessLayer .
+  ?a a ?src .
+  ?b a ?target .
+  ?a ?rel ?b .
+}
+GROUP BY ?src ?target
+\end{lstlisting}
+
+\section{Gap Analysis Queries}
+\label{sec:annex-a2}
+
+\begin{lstlisting}[
+	caption={ABBs present in both architectures (Kept)},
+	label={lst:annex-kept-elements-query}
+]
+# Newly introduced prefix for this listing.
+PREFIX ex: <http://www.example.org/eakg#>
+# Case-study IDs: baseline = ex:id-47396; target = ex:id-46339.
+SELECT ?shared_element
+WHERE {
+  ex:id-47396 archimate:Aggregation ?shared_element .
+  ex:id-46339 archimate:Aggregation ?shared_element .
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={ABBs present only in the baseline (candidates for elimination)},
+	label={lst:annex-eliminated-elements-query}
+]
+# Prefix used for the gap-analysis resources and properties.
+PREFIX ex: <http://www.example.org/eakg#>
+SELECT ?baseline_element
+WHERE {
+  ex:id-47396 archimate:Aggregation ?baseline_element .
+  FILTER NOT EXISTS {
+    ex:id-46339 archimate:Aggregation ?baseline_element .
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={ABBs present only in the target (new gaps)},
+	label={lst:annex-new-elements-query}
+]
+# Prefix used for the gap-analysis resources and properties.
+PREFIX ex: <http://www.example.org/eakg#>
+SELECT ?target_element
+WHERE {
+  ex:id-46339 archimate:Aggregation ?target_element .
+  FILTER NOT EXISTS {
+    ex:id-47396 archimate:Aggregation ?target_element .
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Classify elements as Kept, Eliminated, or New in one query},
+	label={lst:annex-gap-classify-query}
+]
+# Newly introduced prefix for this query.
+PREFIX ex: <http://www.example.org/eakg#>
+
+SELECT ?ABB ?label ?state
+WHERE {
+    BIND(ex:id-46339 AS ?target)
+    BIND(ex:id-47396 AS ?baseline)
+    {
+        ?baseline archimate:Aggregation ?ABB .
+        ?target archimate:Aggregation ?ABB .
+        ?ABB rdfs:label ?label .
+        BIND("Kept" AS ?state)
+    }
+    UNION
+    {
+        ?baseline archimate:Aggregation ?ABB .
+        FILTER NOT EXISTS {
+            ?target archimate:Aggregation ?ABB .
+        }
+        ?ABB rdfs:label ?label .
+        BIND("Eliminated" AS ?state)
+    }
+    UNION
+    {
+        ?target archimate:Aggregation ?ABB .
+        FILTER NOT EXISTS {
+            ?baseline archimate:Aggregation ?ABB .
+        }
+        ?ABB rdfs:label ?label .
+        BIND("New" AS ?state)
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Mark gap decisions via SPARQL Update},
+	label={lst:annex-gap-mark-decisions-query}
+]
+# Prefix used for the gap-analysis resources and properties.
+PREFIX ex: <http://www.example.org/eakg#>
+
+# Record one reviewed new element and one eliminated element.
+
+INSERT {
+  ?gap ex:gapNew ex:id-46919 .
+  ?gap ex:gapEliminated ex:id-46864 .
+}
+WHERE {
+  ?gap archimate:Association ex:id-47396 .
+  ?gap archimate:Association ex:id-46339 .
+}
+\end{lstlisting}
+
+\section{Architecture Evolution Query}
+\label{sec:annex-archi-evo-queries}
+
+\begin{lstlisting}[
+	caption={SPARQL equivalent of a DL query for transformation lookup},
+	label={lst:annex-equi-dl-tansformation}
+]
+# Prefix used for the transformation vocabulary.
+PREFIX ex: <http://www.example.org/eakg#>
+
+SELECT ?transformation
+WHERE {
+  ?transformation rdf:type ex:Transformation .
+  ?project ex:name "Back-Office System Integration" .
+  ?transformation ex:appliedBy ?project .
+}
+\end{lstlisting}
+
+\section{Structural and Connectivity Smells Queries}
+\label{sec:annex-structural-connectivity-smells-queries}
+
+\begin{lstlisting}[
+	caption={Detect cyclic dependencies},
+	label={lst:annex-detect-cyclic-query}
+]
+SELECT DISTINCT ?node ?label
+WHERE {
+  ?node rdfs:label ?label .
+  ?node archimate:DependencyRelationship+ ?node .
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Detect shared persistency},
+	label={lst:annex-detect-shared-persistency-query}
+]
+SELECT ?dataNode ?label
+       (COUNT(DISTINCT ?businessNode) AS ?accessCount)
+WHERE {
+  ?dataNode a archimate:PassiveStructureElement .
+  ?dataNode rdfs:label ?label .
+  ?businessNode a archimate:BusinessLayer .
+  ?businessNode archimate:Access ?dataNode .
+}
+GROUP BY ?dataNode ?label
+HAVING (COUNT(DISTINCT ?businessNode) >= 2)
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Detect data-only services},
+	label={lst:annex-detect-data-only-query}
+]
+SELECT DISTINCT ?service ?label
+WHERE {
+  ?service a ?serviceType .
+  FILTER (?serviceType IN (archimate:ApplicationService,
+                           archimate:BusinessService))
+  ?service rdfs:label ?label .
+  ?relOut rdfs:subPropertyOf* archimate:Relationship .
+  ?service ?relOut ?dataNode .
+  ?dataNode a ?dataType .
+  ?dataType rdfs:subClassOf* archimate:PassiveStructureElement .
+  FILTER NOT EXISTS {
+    ?relOther rdfs:subPropertyOf* archimate:Relationship .
+    ?service ?relOther ?otherNode .
+    ?otherNode a ?otherType .
+    ?otherType rdfs:subClassOf* ?forbiddenClass .
+    FILTER (?forbiddenClass IN (
+      archimate:ActiveStructureElement,
+      archimate:BehaviorElement))
+  }
+}
+\end{lstlisting}
+
+\section{Model Quality Smells Queries}
+\label{sec:annex-model-quality-smells-queries}
+
+
+\begin{lstlisting}[
+	caption={Detect duplicate elements by name},
+	label={lst:annex-detect-dup-element-query}
+]
+SELECT ?label (COUNT(DISTINCT ?node) AS ?instanceCount)
+WHERE {
+  ?node rdfs:label ?label .
+  FILTER(isIRI(?node))
+}
+GROUP BY ?label
+HAVING (COUNT(DISTINCT ?node) > 1)
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Detect unnecessarily long documentation},
+	label={lst:annex-detect-long-doc}
+]
+SELECT ?element ?comment
+       (STRLEN(STR(?comment)) AS ?length)
+WHERE {
+  ?element rdfs:comment ?comment .
+  FILTER (STRLEN(STR(?comment)) > 400)
+}
+\end{lstlisting}
+
+\section{EA Smell Tagging Queries}
+
+The following \texttt{INSERT} queries materialize \texttt{smells:hasSmell} triples on the elements or relations identified by the detection queries above. They use the additional prefix \texttt{smells: <http://purl.org/eakg/smells\#>}.
+
+\begin{lstlisting}[
+	caption={Tag cyclic dependency elements},
+	label={lst:annex-tag-cyclic-dep-query}
+]
+INSERT {
+  ?node smells:hasSmell smells:CyclicDependency .
+} WHERE {
+  ?node archimate:DependencyRelationship+ ?node .
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Tag shared persistency data nodes},
+	label={lst:annex-shared-persistency-query}
+]
+INSERT { ?dataNode smells:hasSmell smells:SharedPersistency . }
+WHERE {
+  {
+    SELECT ?dataNode WHERE {
+      ?dataNode a archimate:PassiveStructureElement .
+      ?businessNode a archimate:BusinessLayer .
+      ?businessNode archimate:Access ?dataNode .
+    }
+    GROUP BY ?dataNode
+    HAVING (COUNT(DISTINCT ?businessNode) >= 2)
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Tag strict layers violation edges},
+	label={lst:annex-tag-strict-layers-violation-query}
+]
+INSERT {
+  ?relation smells:hasSmell smells:StrictLayersViolation .
+} WHERE {
+  {
+    ?nodeA a archimate:BusinessLayer .
+    ?nodeB a archimate:TechnologyLayer .
+    ?nodeA ?relation ?nodeB .
+  } UNION {
+    ?nodeA a archimate:TechnologyLayer .
+    ?nodeB a archimate:BusinessLayer .
+    ?nodeA ?relation ?nodeB .
+  }
+  ?relation rdfs:subPropertyOf* archimate:Relationship .
+  FILTER(STRSTARTS(STR(?relation), "http://www.example.org/eakg#id"))
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Tag chatty service nodes},
+	label={lst:annex-tag-chatty-service-nodes-query}
+]
+INSERT {
+  ?service smells:hasSmell smells:ChattyService .
+} WHERE {
+  {
+    SELECT ?service WHERE {
+      ?service a ?serviceType .
+      FILTER (?serviceType IN (archimate:ApplicationService,
+                               archimate:BusinessService))
+      { ?service ?relation ?connectedElement . }
+      UNION
+      { ?connectedElement ?relation ?service . }
+      ?relation rdfs:subPropertyOf* archimate:Relationship .
+      FILTER(STRSTARTS(STR(?relation),
+             "http://www.example.org/eakg#id"))
+    }
+    GROUP BY ?service
+    HAVING (COUNT(DISTINCT ?connectedElement) >= 10)
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Tag data-only service nodes},
+	label={lst:annex-tag-data-only-query}
+]
+INSERT {
+  ?service smells:hasSmell smells:DataService .
+} WHERE {
+  ?service a ?serviceType .
+  FILTER (?serviceType IN (archimate:ApplicationService,
+                           archimate:BusinessService))
+  ?relOut rdfs:subPropertyOf* archimate:Relationship .
+  ?service ?relOut ?dataNode .
+  ?dataNode a ?dataType .
+  ?dataType rdfs:subClassOf* archimate:PassiveStructureElement .
+  FILTER NOT EXISTS {
+    ?relOther rdfs:subPropertyOf* archimate:Relationship .
+    ?service ?relOther ?otherNode .
+    ?otherNode a ?otherType .
+    ?otherType rdfs:subClassOf* ?forbiddenClass .
+    FILTER (?forbiddenClass IN (
+      archimate:ActiveStructureElement,
+      archimate:BehaviorElement))
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Tag duplicate elements},
+	label={lst:annex-tag-duplicate-query}
+]
+INSERT { ?node smells:hasSmell smells:Duplication . }
+WHERE {
+  ?node rdfs:label ?label .
+  FILTER(isIRI(?node))
+  {
+    SELECT ?label WHERE {
+      ?innerNode rdfs:label ?label .
+      FILTER(isIRI(?innerNode))
+    }
+    GROUP BY ?label
+    HAVING (COUNT(DISTINCT ?innerNode) > 1)
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Tag unnecessarily long documentation},
+	label={lst:annex-tag-unecessary-long-doc-query}
+]
+INSERT { ?resource smells:hasSmell smells:UnnecessaryDocumentation . }
+WHERE {
+  ?resource rdfs:comment ?comment .
+  FILTER (!STRSTARTS(STR(?resource), "http://purl.org/eakg/archimate"))
+  FILTER (!STRSTARTS(STR(?resource), "http://purl.org/eakg/smells"))
+  FILTER (STRLEN(STR(?comment)) > 400)
+}
+\end{lstlisting}
+
+\section{Smell Tag Utility Queries}
+
+Replace \texttt{smells:CyclicDependency} with any smell URI to parameterize these utility queries.
+
+\begin{lstlisting}[
+	caption={Reset (delete) tags for a specific smell},
+	label={lst:annex-reset-smell}
+]
+DELETE WHERE {
+  ?element smells:hasSmell smells:CyclicDependency .
+}
+\end{lstlisting}
+
+\section{Visualization Queries}
+\label{sec:annex-vissualization-queries}
+
+\begin{lstlisting}[
+	caption={Connection between Business and Application Layer},
+	label={lst:annex-connection-business-application-query}
+]
+CONSTRUCT {
+    ?layer1 ?rel1 ?layer2 .
+    ?layer2 ?rel2 ?layer1 .
+}
+WHERE {
+    # Select Classes
+    ?layer1 rdfs:subClassOf archimate:ApplicationLayer .
+    BIND(archimate:ApplicationLayer AS ?layer1Class)
+    ?layer2 rdfs:subClassOf archimate:BusinessLayer .
+    BIND(archimate:BusinessLayer AS ?layer2Class)
+    ?a a ?layer1 .
+    ?b a ?layer2 .
+{
+        ?a a ?layer1 .
+        ?b a ?layer2 .
+        ?a ?rel1 ?b .
+    }
+    UNION
+    {
+        ?a a ?layer1 .
+        ?b a ?layer2 .
+        ?b ?rel2 ?a .
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Dependency Chain Expansion Query},
+	label={lst:dep-chain-expantion-query}
+]
+CONSTRUCT {
+    ?node ?rel ?target .
+}
+WHERE {
+    ?node ?rel ?target .
+    ?rel rdfs:subPropertyOf ?parentRel .
+    VALUES ?parentRel { 
+        archimate:DependencyRelationship 
+        archimate:StructuralRelationship 
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+	caption={Relations between Technology Layer Elements},
+	label={lst:relations-tech-layer-query}
+]
+CONSTRUCT {
+    # 1. Draw the actual relationships (edges) between the nodes
+    ?src ?rel ?target . 
+    ?src rdfs:label ?srName .
+    ?target rdfs:label ?targetName .
+}
+WHERE {
+    ?src a archimate:TechnologyLayer ;
+          ?rel ?target .
+    ?target a archimate:TechnologyLayer .
+}
+\end{lstlisting}

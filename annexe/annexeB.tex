@@ -1,0 +1,14 @@
+This annex records the implementation details omitted from Chapter~2 for readability.
+\section{Utility Functions}
+\begin{itemize}
+  \item \texttt{id\_to\_iri(identifier)} converts element and relationship identifiers to the \texttt{ex:} namespace.
+  \item \texttt{property\_name\_to\_iri(key\_name)} sanitizes property keys and prevents digit-leading local names.
+  \item \texttt{resolve\_archimate\_class(xsi\_type\_value)} maps XML \texttt{xsi:type} values to \texttt{archimate:} URIs.
+  \item \texttt{emit\_lang\_literals(...)} emits language-tagged literals for names and documentation, falling back to \texttt{xsd:string} when no language is supplied.
+\end{itemize}
+\section{Translator Passes}
+\begin{enumerate}
+  \item \textbf{Pass 1}: read each property definition, resolve its datatype, create its sanitized predicate IRI, emit \texttt{owl:DatatypeProperty}, \texttt{rdfs:subPropertyOf archimate:Property}, and \texttt{rdfs:range} triples, then store the predicate/datatype pair by definition ID.
+  \item \textbf{Pass 2}: convert each element ID to an IRI, resolve its ArchiMate class, declare the named individual and its type, emit multilingual labels/comments, and resolve property values through the Pass~1 dictionary.
+  \item \textbf{Pass 3}: convert each relationship ID into an object-property predicate, declare its ArchiMate sub-property, attach documentation, emit the source-to-target edge, and resolve relationship property values through the same dictionary.
+\end{enumerate}

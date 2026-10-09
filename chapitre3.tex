@@ -36,9 +36,9 @@ WHERE {
 
 All subsequent queries in this chapter and in the Annex assume the same prefixes unless otherwise noted.
 
-Dependency chains can also be traversed in the opposite direction. For example, the query below lists what depends on a given component (here, ``PaaS Services''):
+Dependency chains can also be traversed in the opposite direction. For example, another query lists what depends on a given component (e.g. ``PaaS Services''):
 
-\textit{(full query: see Annex, Listing A.1)}
+\textit{(full query: see \autoref{lst:annex-reverse-dep-query})}
 
 \begin{table}[H]
 \centering
@@ -66,7 +66,7 @@ ex:id-47094 & ex:id-47501 & Front Office \\
 \subsection{Orphan Element Detection}
 \label{subsec:orphan-elements}
 
-A useful model quality check is to find elements that have no relationship with any other element---orphan nodes that may have been forgotten during modeling:
+A useful model-quality check is to identify elements that have no relationship with any other element---orphan nodes that may have been forgotten during modeling:
 
 \begin{lstlisting}[caption={Detect orphan elements (no incoming or outgoing relationships)}]
 SELECT ?element ?elementName
@@ -90,7 +90,7 @@ The query returns 15 orphan elements in the ArchiSurance model, including Produc
 \subsection{Most Connected Elements}
 \label{subsec:most-connected}
 
-Sorting elements by their total number of relationships (incoming and outgoing) helps identify the most central components of the architecture:
+Sorting elements by their total number of relationships (incoming and outgoing) helps identify the elements with the highest number of relationships in the architecture:
 
 \begin{lstlisting}[caption={Rank elements by total number of relationships}]
 SELECT ?element ?elementName
@@ -140,16 +140,16 @@ ex:id-46369 & Serve Customers & 14 \\
 \end{table}
 
 % ------------------------------------------------------------------
-\subsection{Layer Listings}
+\subsection{Elements by ArchiMate Layer}
 \label{subsec:layer-listings}
 
 The following query lists all elements together with their ArchiMate layer classification, exploiting the ontology's class hierarchy:
 
-\textit{(full query: see Annex, Listing A.2)}
+\textit{(full query: see \autoref{lst:annex-layer-element-query})}
 
 Elements can also be listed by the relationships between layers. The cross-layer count below reports the four Application-to-Business type pairs returned by the query.
 
-\textit{(full query: see Annex, Listing A.3)}
+\textit{(full query: see \autoref{lst:annex-inter-layer-connections-query})}
 
 \begin{table}[H]
 \centering
@@ -168,16 +168,66 @@ archimate:ApplicationProcess & archimate:BusinessProcess & 1 \\
 \end{tabularx}
 \end{table}
 
+% ------------------------------------------------------------------
+\section{Visualization Queries}
+\label{sec:visualization-queries}
+
+In this section, we present three CONSTRUCT SPARQL queries which can be used in the GraphDB visualization tool to have customizable views of the graph for analysis.
+
+\subsection{Connection Between Layers}
+\label{subsec:layers-connections}
+
+This query shows the inter-layer relationships between different types of elements across two layers. For example, this query displays links between the Business and Application layers.
+
+\textit{(full query: see \autoref{lst:annex-connection-business-application-query})}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{business-application-relations.png}
+  \caption{Query result: connections between the Business and Application layers}
+  \label{fig:business-application-relations}
+\end{figure}
+
+\subsection{Dependency Chain Expansion Query}
+\label{subsec:dep-chain-expansion}
+
+This is an expansion query that allows an element to be used as a starting point; by expanding each element, we can follow the dependency chain and visualize it.
+
+\textit{(full query: see \autoref{lst:dep-chain-expantion-query})}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{dependency-chain.png}
+  \caption{PaaS services dependency-chain expansion query}
+  \label{fig:paas-services-dep-chain}
+\end{figure}
+
+\subsection{Intra-Layer Connections Query}
+\label{subsec:intra-layer-connections}
+
+This query visualizes the relationships between elements of the same layer and colors the nodes based on their type.
+
+\textit{(full query: see \autoref{lst:relations-tech-layer-query})}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{technology-layer-connections.png}
+  \caption{Technology Layer Connections}
+  \label{fig:technology-layer-connections}
+\end{figure}
+
 % ==================================================================
 \section{Gap Analysis}
 \label{sec:gap-analysis}
+
+This section demonstrates the utility of representing EA models as knowledge graphs by using SPARQL queries to automate parts of the Gap Analysis activity defined in the TOGAF standard. It then presents an enrichment ontology that allows additional information about organizational evolution to be incorporated into the model, which is not supported by the base ArchiMate model.
 
 \subsection{The TOGAF Gap Analysis Technique}
 \label{subsec:togaf-gap}
 
 According to the \textit{TOGAF}\textsuperscript{\textregistered} Standard---ADM Technique, Gap Analysis is a technique used to validate an architecture that is being developed \parencite{opengroup2022togaf}. The basic premise is to highlight a shortfall between the Baseline Architecture and the Target Architecture; that is, items that have been deliberately omitted, accidentally left out, or not yet defined.
 
-In other words, Gap Analysis is the process of comparing the current architecture baseline with the new architecture we want to achieve in the future (target) to identify what needs to be added, removed, or modified. A key step in validating the architecture is to identify what has been forgotten.
+In other words, Gap Analysis is the process of comparing the current architecture baseline with the target architecture to identify what needs to be added, removed, or modified. A key step in validating the architecture is to identify potentially omitted elements
 
 \noindent\textbf{Suggested Method by the Standard}\par
 
@@ -210,102 +260,40 @@ In ArchiMate, the ``Implementation and Migration Layer'' includes elements that 
 \subsection{Knowledge Graph Role in Gap Analysis}
 \label{subsec:kg-gap}
 
-By transforming the ArchiMate model into a knowledge graph, we can automate the creation of the matrix in the Gap Analysis process. By querying the Knowledge Graph we can extract the list of ``Kept,'' ``Eliminated,'' and ``New'' ABBs. After evaluation by the architect, those elements are marked by linking them to the ``Gap'' node with the appropriate property, to keep track of taken decisions in the knowledge graph.
-
-\noindent\textbf{Queries to List Gap Elements}\par
+\subsubsection{Queries for Gap Element Classification}
+\label{subsubsec:kg-gap-queries}
+By transforming the ArchiMate model into a knowledge graph, we can automate the creation of the matrix in the Gap Analysis process. By querying the Knowledge Graph we can extract the list of ``Kept,'' ``Eliminated,'' and ``New'' ABBs.
 
 Three queries extract the gap classification directly from the knowledge graph:
 
 \begin{enumerate}
-    \item \textbf{ABBs present in both architectures (Kept).} This query returns the elements aggregated by both the baseline and target plateaus. \textit{(full query: see Annex, Listing A.4)}
-    \item \textbf{ABBs present only in the baseline (candidates for elimination).} This query identifies elements that belong to the baseline plateau but are absent from the target plateau. \textit{(full query: see Annex, Listing A.5)}
-    \item \textbf{ABBs present only in the target (new gaps).} This query identifies elements introduced in the target plateau that do not exist in the baseline plateau. \textit{(full query: see Annex, Listing A.6)}
+    \item \textbf{ABBs present in both architectures (Kept).} This query returns the elements aggregated by both the baseline and target plateaus. \textit{(full query: see \autoref{lst:annex-kept-elements-query})}
+    \item \textbf{ABBs present only in the baseline (candidates for elimination).} This query identifies elements that belong to the baseline plateau but are absent from the target plateau. \textit{(full query: see \autoref{lst:annex-eliminated-elements-query})}
+    \item \textbf{ABBs present only in the target (new gaps).} This query identifies elements introduced in the target plateau that do not exist in the baseline plateau. \textit{(full query: see \autoref{lst:annex-new-elements-query})}
 \end{enumerate}
 
-\noindent\textbf{Marking Elements After Review}\par
+\subsubsection{Enrichment Ontology: Gap Analysis and Evolution Modeling}
 
-We use project-specific RDF properties to link the ``Gap'' node with each element that presents a gap, which allows us to mark elements with the appropriate decision after review:
+The proposed ontology is composed of two parts:
 
-\begin{itemize}
-    \item \texttt{ex:gapNew} for new ABBs to be produced/procured.
-    \item \texttt{ex:gapInclude} for ABBs to be kept, which has a sub-property \texttt{ex:gapImproved} for kept ABBs that require improvement.
-    \item \texttt{ex:gapEliminated} for ABBs correctly removed from the architecture.
-\end{itemize}
-
-% ------------------------------------------------------------------
-\subsection{Example: ArchiSurance Case Study}
-\label{subsec:gap-example}
-
-Using the ArchiSurance case study \parencite{jonkers2016archisurance}, we can model the evolution with a ``Gap'' between two plateaus:
+\emph{Gap analysis}, which includes four predicates. After reviewing each element, the architect assigns the appropriate property by inserting triples associated with the ``Gap'' node to each element identified as part of a gap, allowing the appropriate decision to be recorded after review:
 
 \begin{itemize}
-    \item The \textbf{baseline plateau} aggregates: Web Portal, Call Center Application, Legal Expense CRM System, General CRM System, Home \& Away Financial Application, Home \& Away Policy Administration, Auto Insurance Application, Legal Expense Back-Office System, Document Management System.
-    \item The \textbf{target plateau} aggregates: Web Portal, Call Center Application, General CRM System, Document Management System, ArchiSurance Back-Office Suite, Data Warehousing Solution, MyArchiSurance Mobile App.
+    \item \texttt{gap:gapNew} for new ABBs to be produced/procured.
+    \item \texttt{gap:gapInclude} for ABBs to be kept This property has a sub-property \texttt{gap:gapImproved} for kept ABBs that require improvement.
+    \item \texttt{gap:gapEliminated} for ABBs correctly removed from the architecture.
 \end{itemize}
 
-In the knowledge graph, each plateau is represented with a node that has an ``aggregate'' property linking it to all its included elements, and a ``Gap'' node is associated with both plateau nodes. Using the previous queries, we can list the gap classification without the need to draw the matrix:
-
-\begin{itemize}
-    \item \textbf{Kept}: Web Portal, Call Center Application, General CRM System, Document Management System.
-    \item \textbf{Eliminated}: Legal Expense CRM System, Home \& Away Financial Application, Home \& Away Policy Administration, Auto Insurance Application, Legal Expense Back-Office System.
-    \item \textbf{New}: ArchiSurance Back-Office Suite, Data Warehousing Solution, MyArchiSurance Mobile App.
-\end{itemize}
-
-The following combined query classifies elements from the gap analysis according to the TOGAF gap analysis matrix, using concrete identifiers from the ArchiSurance model:
-
-\begin{lstlisting}[caption={Classify elements as Kept, Eliminated, or New in one query}]
-# Newly introduced prefix for this query.
-PREFIX ex: <http://www.example.org/eakg#>
-
-SELECT ?ABB ?label ?state
-WHERE {
-    BIND(ex:id-46339 AS ?target)
-    BIND(ex:id-47396 AS ?baseline)
-    {
-        ?baseline archimate:Aggregation ?ABB .
-        ?target archimate:Aggregation ?ABB .
-        ?ABB rdfs:label ?label .
-        BIND("Kept" AS ?state)
-    }
-    UNION
-    {
-        ?baseline archimate:Aggregation ?ABB .
-        FILTER NOT EXISTS {
-            ?target archimate:Aggregation ?ABB .
-        }
-        ?ABB rdfs:label ?label .
-        BIND("Eliminated" AS ?state)
-    }
-    UNION
-    {
-        ?target archimate:Aggregation ?ABB .
-        FILTER NOT EXISTS {
-            ?baseline archimate:Aggregation ?ABB .
-        }
-        ?ABB rdfs:label ?label .
-        BIND("New" AS ?state)
-    }
-}
-\end{lstlisting}
-
-After reviewing each element, we mark it with the appropriate property by inserting triples with the ``Gap'' node. The following SPARQL Update query shows how decisions are recorded:
-
-\textit{(full query: see Annex, Listing A.7)}
-
-% ------------------------------------------------------------------
-\subsection{Further Exploration: Ontology-Based EA Evolution}
-\label{subsec:gap-further}
-
-A small ontology to model enterprise evolution is proposed in \parencite{silva2017evolution}, taking advantage of computer agents to aid communication and analysis of EA model evolution. The key concepts of this ontology are:
+\emph{Evolution modeling}: we implemented the small ontology proposed in \parencite{silva2017evolution} to model enterprise evolution, taking advantage of computational agents to support communication and analysis of EA model evolution.
 
 \begin{itemize}
     \item An \textbf{IT Project} acts as an enabler of EA evolution by applying a set of \textbf{Transformations}.
     \item A Transformation can be decomposed into smaller \textbf{Changes}, each altering the life-cycle of an EA Description (element or relationship).
     \item To keep track of motivation and interested parties, the ontology introduces \textbf{Stakeholder} (who has one or more drivers) and \textbf{Driver} (an internal or external motivation/condition that makes the change necessary).
-    \item This model keeps information about how the EA was changed, when those changes happened, who involved those changes, and why.
+    \item This model records how the EA was changed, when the changes occurred, who was involved, and why they were made.
 \end{itemize}
 
-The authors proposed a set of Description Logic (DL) queries to answer questions that help decision-making and facilitate change analysis. In our case, DL queries can be replaced with equivalent SPARQL queries into the knowledge graph.
+Silva et al. \parencite{silva2017evolution} proposed a set of Description Logic (DL) queries to answer questions that help decision-making and facilitate change analysis. In our case, DL queries can be replaced with equivalent SPARQL queries into the knowledge graph.
 
 \begin{samepage}
 For example, to find what transformations are applied by an IT project named ``Back-Office System Integration,'' the proposed DL query:
@@ -320,7 +308,53 @@ Transformation and
 
 can be expressed as the following SPARQL equivalent:
 
-\textit{(full query: see Annex, Listing A.8)}
+\textit{(full query: see \autoref{lst:annex-equi-dl-tansformation})}
+
+The full ontology is available online on \url{http://purl.org/eakg/gap_evolution}.
+% ------------------------------------------------------------------
+\subsection{Example: ArchiSurance Case Study}
+\label{subsec:gap-example}
+
+Using the ArchiSurance case study \parencite{jonkers2016archisurance}, we can model the evolution with a ``Gap'' between two plateaus:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{gap-analysis-table.png}
+  \caption{Gap Analysis: Plateau Differences}
+  \label{fig:gap-analysis-table}
+\end{figure}
+
+In the knowledge graph, each plateau is represented by a node that has an \texttt{aggregate} property linking it to all its included elements. And a ``Gap'' node is associated with both plateau nodes. Using the previous queries, we can list the gap classification without the need to draw the matrix:
+
+The gap analysis query produces the following results.
+
+\begin{table}[H]
+\centering
+\caption{Gap analysis classification}
+\label{tab:gap-analysis-results}
+\small
+\begin{tabularx}{\linewidth}{l X c}
+\hline
+\textbf{ABB} & \textbf{label} & \textbf{state} \\
+\hline
+ex:id-46862 & General CRM System & Kept \\
+ex:id-46917 & Call Center Application & Kept \\
+ex:id-46916 & Web Portal & Kept \\
+ex:id-46860 & Document Management System & Kept \\
+ex:id-46864 & Legal Expense CRM System & Eliminated \\
+ex:id-46915 & Home \& Away Financial Application & Eliminated \\
+ex:id-46913 & Legal Expense Back Office System & Eliminated \\
+ex:id-46914 & Auto Insurance Application & Eliminated \\
+ex:id-46918 & Home \& Away Policy Administration & Eliminated \\
+ex:id-46299 & Data Warehousing Solution & New \\
+ex:id-46304 & ArchiSurance Back Office Suite & New \\
+\hline
+\end{tabularx}
+\end{table}
+
+After reviewing each element, we mark it with the appropriate property by inserting triples with the ``Gap'' node. The following SPARQL Update query shows how decisions are recorded:
+
+\textit{(full queries: see \autoref{lst:annex-gap-classify-query} and \autoref{lst:annex-gap-mark-decisions-query})}
 
 % ==================================================================
 \section{EA Smells Detection Queries}
@@ -338,9 +372,9 @@ Enterprise Architecture Smells are recurring patterns in an EA model that indica
 
 \textbf{The Detection Logic:} We target the \texttt{archimate:DependencyRelationship} hierarchy and scan the graph globally to match unbroken chains of these dependency edges. If traversing that chain eventually leads right back to the exact same starting node, a cycle is detected.
 
-\textit{(full query: see Annex, Listing A.9)}
+\textit{(full query: see \autoref{lst:annex-detect-cyclic-query})}
 
-Each element in the cycle is tagged with \texttt{smells:CyclicDependency}. \textit{(tagging query: see Annex, Listing A.14)}
+Each element in the cycle is tagged with \texttt{smells:CyclicDependency}. \textit{(tagging query: see \autoref{lst:annex-tag-cyclic-dep-query})}
 
 \noindent\textbf{Shared Persistency}\par
 
@@ -348,9 +382,9 @@ Each element in the cycle is tagged with \texttt{smells:CyclicDependency}. \text
 
 \textbf{The Detection Logic:} We isolate \texttt{archimate:PassiveStructureElement} nodes, which represent data. We then look for instances where two or more distinct elements from the \texttt{archimate:BusinessLayer} have an \texttt{archimate:Access} edge pointing directly to that exact same data node.
 
-\textit{(full query: see Annex, Listing A.10)}
+\textit{(full query: see \autoref{lst:annex-detect-shared-persistency-query})}
 
-The shared data node is tagged with \texttt{smells:SharedPersistency}. \textit{(tagging query: see Annex, Listing A.15)}
+The shared data node is tagged with \texttt{smells:SharedPersistency}. \textit{(tagging query: see \autoref{lst:annex-shared-persistency-query})}
 
 \noindent\textbf{Strict Layers Violation}\par
 
@@ -380,7 +414,7 @@ WHERE {
 }
 \end{lstlisting}
 
-The offending relationship edge is tagged with \texttt{smells:StrictLayersViolation}. \textit{(tagging query: see Annex, Listing A.16)}
+The offending relationship edge is tagged with \texttt{smells:StrictLayersViolation}. \textit{(tagging query: see \autoref{lst:annex-tag-strict-layers-violation-query})}
 
 % ------------------------------------------------------------------
 \subsection{Service and Interaction Smells}
@@ -415,7 +449,7 @@ GROUP BY ?service ?label
 HAVING (COUNT(DISTINCT ?connectedElement) >= 10)
 \end{lstlisting}
 
-The overly communicative service node is tagged with \texttt{smells:ChattyService}. \textit{(tagging query: see Annex, Listing A.17)}
+The overly communicative service node is tagged with \texttt{smells:ChattyService}. \textit{(tagging query: see \autoref{lst:annex-tag-chatty-service-nodes-query})}
 
 \noindent\textbf{Data Service}\par
 
@@ -423,9 +457,9 @@ The overly communicative service node is tagged with \texttt{smells:ChattyServic
 
 \textbf{The Detection Logic:} We isolate service nodes and evaluate their \emph{outgoing} relationships (where the service acts as the source). We identify services that have outgoing edges pointing to \texttt{archimate:PassiveStructureElement} nodes, but apply a strict filter to ensure they have \emph{zero} outgoing edges pointing to any \texttt{archimate:ActiveStructureElement} or \texttt{archimate:BehaviorElement}. Incoming edges (other components calling the service) are expected and are ignored by this filter.
 
-\textit{(full query: see Annex, Listing A.11)}
+\textit{(full query: see \autoref{lst:annex-detect-data-only-query})}
 
-The data-only service node is tagged with \texttt{smells:DataService}. \textit{(tagging query: see Annex, Listing A.18)}
+The data-only service node is tagged with \texttt{smells:DataService}. \textit{(tagging query: see \autoref{lst:annex-tag-data-only-query})}
 
 % ------------------------------------------------------------------
 \subsection{Model Quality Smells}
@@ -437,9 +471,9 @@ The data-only service node is tagged with \texttt{smells:DataService}. \textit{(
 
 \textbf{The Detection Logic:} We compare the \texttt{rdfs:label} (the name) across the graph. If we find two or more distinct nodes (different IRIs) sharing the exact same label, they are flagged as duplicates.
 
-\textit{(full query: see Annex, Listing A.12)}
+\textit{(full query: see \autoref{lst:annex-detect-dup-element-query})}
 
-Each element sharing its label with at least one other element is tagged with \texttt{smells:Duplication}. \textit{(tagging query: see Annex, Listing A.19)}
+Each element sharing its label with at least one other element is tagged with \texttt{smells:Duplication}. \textit{(tagging query: see \autoref{lst:annex-tag-duplicate-query})}
 
 \noindent\textbf{Unnecessary Documentation}\par
 
@@ -447,9 +481,9 @@ Each element sharing its label with at least one other element is tagged with \t
 
 \textbf{The Detection Logic:} We extract the \texttt{rdfs:comment} string literal for every element in the graph, calculate the character length of that string, and flag comments that exceed a specific character limit (e.g., 400 characters).
 
-\textit{(full query: see Annex, Listing A.13)}
+\textit{(full query: see \autoref{lst:annex-detect-long-doc})}
 
-Any model resource exceeding the character limit is tagged with \texttt{smells:UnnecessaryDocumentation}. \textit{(tagging query: see Annex, Listing A.20)}
+Any model resource exceeding the character limit is tagged with \texttt{smells:UnnecessaryDocumentation}. \textit{(tagging query: see \autoref{lst:annex-tag-unecessary-long-doc-query})}
 
 \subsection{Utility Functions}
 \label{subsec:utility-functions}
@@ -464,5 +498,4 @@ SELECT ?element ?label WHERE {
 }
 \end{lstlisting}
 
-A corresponding query for resetting a selected smell tag is provided in Annex,
-Listing A.21.
+A corresponding query for resetting a selected smell tag is provided in \autoref{lst:annex-reset-smell}

@@ -47,6 +47,7 @@
 \usepackage{tabularx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{listings}
+\usepackage[htt]{hyphenat} % allow break lines inside \texttt
 \lstdefinelanguage{SPARQL}{
   morekeywords={SELECT,DISTINCT,WHERE,FILTER,OPTIONAL,UNION,ORDER,BY,
     DESC,ASC,LIMIT,GROUP,HAVING,COUNT,COALESCE,AS,NOT,EXISTS,
@@ -110,19 +111,21 @@
 
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
+Enterprise Architecture (EA) provides a high-level view of an enterprise's business and IT systems and their interrelationships. It can be decomposed to \emph{standards} which allow analysis of the current state of an enterprise and the planning of its evolution, and \emph{models} consists of description of different elements organized in layers (Business, Application, Technology\ldots) \parencite{Gong2019}.
 
-Enterprise architecture models offer an integrated and unified representation of the different layers of an organization's activity, thereby facilitating decision-making. These layers structure the vision of business processes, application architecture, technical infrastructure, as well as the interactions between them.
+EA has been shown to reduce IT costs, improve communication, and strengthen business--IT alignment \parencite{Gong2019}. Several EA frameworks exist, including the Federal Enterprise Architecture Framework (FEAF), developed for and used by the U.S. federal government, and The Open Group Architecture Framework (TOGAF), widely adopted by organizations.
 
-Modeling languages that allow for the mapping of this architecture are widely used, such as ArchiMate, the standard language of the Open Group. However, to fully exploit these models and automate their analysis via complex queries, a transition to Knowledge Graphs (KG) is being adopted \parencite{glaser2022model}. KGs are currently deployed on a large scale, ranging from the massive KGs of web giants (Google, Facebook, or Amazon) to more targeted enterprise KGs.
-
-Tools like the EAKG Toolkit \parencite{glaser2022toolkit} allow ArchiMate models to be transformed into a KG based on the Property Graph model (supported by the Neo4j DBMS). Another KG standard, originating from the Semantic Web, is the RDF graph model (supported by other DBMSs such as GraphDB).
+ArchiMate is the Open Group modeling language used to create EA models. However, to fully exploit these models and automate their analysis via complex queries, a transition to Knowledge Graphs (KG) is being adopted.
+Tools like the EAKG Toolkit \parencite{glaser2022toolkit} allow ArchiMate models to be transformed into a KG based on the Property Graph model (supported by the Neo4j DBMS). Another KG standard, originating from the Semantic Web, is the RDF \parencite{w3c-rdf} graph model (supported by other DBMSs such as GraphDB).
 
 The objective of this project is to:
+
 \begin{enumerate}
-    \item Provide an algorithm allowing the translation of an ArchiMate model according to the RDF standard. Examples of ArchiMate models are provided as input (in XML). The algorithm, inspired by prior work \parencite{glaser2022model}, must provide the RDF representation of these models. The user will thus be able to export the resulting RDF KG to a DBMS of their choice (GraphDB in our case).
-    \item Propose queries to analyze ArchiMate models through the KG. The queries will be formulated in SPARQL, the standard language for querying the RDF model, similar to SQL for querying a relational model.
-    \item The use of an LLM can be considered to allow querying the obtained KG in natural language---English---(translating the natural language query into the SPARQL language).
+    \item Provide an algorithm allowing the translation of an ArchiMate model to a RDF knowledge graph. ArchiMate models are provided as input with Archimate Exchange Format\parencite{archimateExc}. The algorithm, inspired by prior work \parencite{glaser2022model}, must provide the RDF representation of these models. The user will thus be able to import the resulting RDF KG to a DBMS of their choice (GraphDB in our case).
+    \item Propose queries to exploit and analyze ArchiMate models through the KG. The queries will be formulated in SPARQL, the standard language for querying the RDF model, similar to SQL for querying a relational model.
+    \item The use of an LLM to allow querying the obtained KG in natural language---English---(translating the natural language query into the SPARQL) to answer user questions.
 \end{enumerate}
+
 
 \input{chapitre1.tex}
 \input{chapitre2.tex}
@@ -133,6 +136,25 @@ The objective of this project is to:
 \addcontentsline{toc}{chapter}{Conclusion}
 \input{conclusion.tex}
 
+% =========================================================
+% Annexes
+\appendix
+\fontsize{10pt}{12pt}\selectfont
+\renewcommand{\appendixname}{Annex}
+\chapter*{ANNEXES}
+\addcontentsline{toc}{chapter}{ANNEXES}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}\chapter{Supplementary Material}
+\input{annexe/annexeA.tex}
+\chapter{Implementation Detail}
+\label{chap:annexeB}
+\input{annexe/annexeB.tex}
+\chapter{Detailed AI Evaluation Results}
+\input{annexe/annexeC.tex}
+% ===========================================
+% Refrences
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\fontsize{12pt}{14.5pt}\selectfont
+\clearpage
 \printbibliography[title={References}, heading=bibintoc]
 
 \end{document}

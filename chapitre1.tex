@@ -1,7 +1,7 @@
 \chapter{Translation Methodology: ArchiMate to RDF/OWL}
 \label{chap:translation}
 
-This chapter presents the methodology adopted for translating an ArchiMate model to RDF Knowledge Graphs, and designing an OWL ontology to represent ArchiMate standard semantics and allow better usability of the resulting graph. It begins with the motivation for using Knowledge Graphs in enterprise architecture management, reviews the existing EAKG Tool approach, and then details our RDF-based translation rules, the base ontology design, and the phased construction lifecycle.
+This chapter presents the methodology adopted for translating an ArchiMate model to RDF Knowledge Graphs, and designing an OWL ontology\parencite{w3c-owl} to represent ArchiMate standard semantics and allow better usability of the resulting graph. It begins with the motivation for using Knowledge Graphs in enterprise architecture management, reviews the existing EAKG Tool approach, and then details our ArchiMate-to-RDF translation rules, our Archimate ontology design, and the phased construction lifecycle.
 
 % ------------------------------------------------------------------
 \section{Knowledge Graphs for Enterprise Architecture}
@@ -38,13 +38,34 @@ Our equivalent mapping from ArchiMate models to RDF Knowledge Graphs is formaliz
 \section{ArchiMate to RDF: Our Approach}
 \label{sec:rdf-approach}
 
-Following the approach presented in \parencite{glaser2022model}, we translate ArchiMate models into RDF Knowledge Graphs. The detailed mapping is defined in Section~\ref{sec:rules}; Section~\ref{sec:ontology} introduces the ontology, which provides the semantic vocabulary used by those rules.
+Following the approach presented in \parencite{glaser2022model}, we defined a set of translation rules for transforming an ArchiMate model into an RDF Knowledge Graph, mapping each concrete element, relationship, and property to its corresponding representation in the KG. The detailed mapping is presented in Section~\ref{sec:rules}. Section~\ref{sec:ontology} introduces the OWL ontology we designed to represent ArchiMate semantics in the resulting KG.
 
 % ------------------------------------------------------------------
-\section{The Base Ontology}
+\section{Archimate Ontology}
 \label{sec:ontology}
 
-The ArchiMate framework organizes concepts along two dimensions: \emph{layers} (Strategy, Business, Application, Technology, Physical, and Implementation \& Migration) and \emph{aspects} (Passive Structure, Behavior, Active Structure, and Motivation), as defined by the ArchiMate standard \parencite{opengroup2023archimate}. Our ontology maps the ArchiMate metamodel to OWL classes; its class hierarchy mirrors the metamodel's Layer/Aspect/Concept structure. To illustrate how the ontology classifies architecture elements, Figure~\ref{fig:businessactor-example} shows an example for \texttt{BusinessActor}.
+The ArchiMate specification defines a \emph{model} as a collection of \emph{concepts}, where a concept is either an \emph{element} or a \emph{relationship} \parencite{opengroup2023archimate}. These concepts are organized into a type system that captures the semantics of the ArchiMate language and serves as the basis for our ontology. The top-level hierarchy of concepts is shown in \autoref{fig:concepts-top-level-hierarchy}, along with its corresponding representation in our ontology in \autoref{fig:concepts-top-level-hierarchy-ontology}.
+
+The full Ontology is available at \url{https://purl.org/eakg/archimate}\parencite{eakg-archimate-ontology}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\linewidth]{concepts-top-level-hierarchy.png}
+  \caption{Top-Level Hierarchy of Archimate Concepts}
+  \label{fig:concepts-top-level-hierarchy}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{concepts-top-level-hierarchy-ontology.png}
+  \caption{Ontology Representation of Top-Level Hierarchy of Archimate Concepts}
+  \label{fig:concepts-top-level-hierarchy-ontology}
+\end{figure}
+
+\subsection{Elements in the Ontology}
+\label{subsec:ontology-elements}
+
+\emph{Elements} are organized along two dimensions: \emph{layers} (Strategy, Business, Application, Technology, Physical, and Implementation \& Migration) and \emph{aspects} (Passive Structure, Behavior, Active Structure, and Motivation), as defined by the ArchiMate standard \parencite{opengroup2023archimate}. Our ontology maps the ArchiMate metamodel to OWL classes; its class hierarchy mirrors the metamodel's Layer/Aspect/Concept structure. To illustrate how the ontology classifies architecture elements, Figure~\ref{fig:businessactor-example} shows an example for \texttt{BusinessActor}.
 
 \begin{figure}[H]
   \centering
@@ -53,18 +74,26 @@ The ArchiMate framework organizes concepts along two dimensions: \emph{layers} (
   \label{fig:businessactor-example}
 \end{figure}
 
-\subsection{Relationships in the Ontology}
+\subsection{Relationships and Relationships Connectors in the Ontology}
 \label{subsec:ontology-relationships}
 
-Relationships are modeled as \texttt{owl:ObjectProperty} instances, which connect elements directly. They are organized into four base properties: \texttt{structuralRelationship}, \texttt{dependencyRelationship}, \texttt{dynamicRelationship}, and \texttt{otherRelationship}. Relationship connectors (AND, OR) are modeled as a class that is instantiated to create a junction, then assigned the type ``and'' or ``or''; elements participate in the junction through the appropriate relationship.
+Relationships are modeled as \texttt{owl:ObjectProperty} instances, which connect elements directly. They are organized into four base properties: \texttt{structuralRelationship}, \texttt{dependencyRelationship}, \texttt{dynamicRelationship}, and \texttt{otherRelationship}. Relationship connectors (AND, OR) are modeled as a class that is instantiated to create a junction, then assigned the type ``and'' or ``or''; elements participate in the junction through the appropriate relationship. The relationships hierarchy is represented in \autoref{fig:ontology-relationships-hierarchy}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{ontology-relationships-hierarchy.png
+}
+  \caption{Archimate Ontology Relationships Hierarchy}
+  \label{fig:ontology-relationships-hierarchy}
+\end{figure}
 
 % ------------------------------------------------------------------
 \section{ArchiMate Model Exchange Format}
 \label{sec:exchange-format}
 
-The ArchiMate Model Exchange Format stores a model in XML. The top-level model contains separate containers for the information needed by the translator, notably \texttt{<propertyDefinitions>}, \texttt{<elements>}, and \texttt{<relationships>}. Property definitions declare the available property keys and their datatypes. Element records provide identifiers, types, names, documentation, and property values, while relationship records provide identifiers, relationship types, source and target references, and any associated metadata.
+The ArchiMate Model Exchange Format stores a model in XML. The top-level model contains separate containers for the information required by the translation process, notably \texttt{<propertyDefinitions>}, \texttt{<elements>}, and \texttt{<relationships>}. Property definitions declare the user-defined property keys and their datatypes. Element records provide identifiers, types, names, documentation, and property values, while relationship records provide identifiers, relationship types, source and target references, and associated metadata.
 
-The translator reads these containers in a controlled order: property definitions establish the vocabulary for custom properties, elements establish the resources and their types, and relationships connect those resources. Names and documentation may appear in language-specific \texttt{<name>} and \texttt{<documentation>} entries, so the corresponding language information is preserved when the XML is converted to RDF literals. The resulting RDF/OWL structure is specified formally in Section~\ref{sec:rules}.
+The translator processes these containers in a controlled order: property definitions establish the vocabulary for custom properties, elements define the graph nodes and their types, and relationships connect these nodes. Names and documentation may be provided in language-specific \texttt{<name>} and \texttt{<documentation>} entries; the corresponding language information is therefore preserved when these values are represented as RDF literals. The resulting RDF/OWL structure is formally specified in \autoref{sec:rules}.
 
 % ------------------------------------------------------------------
 \section{Knowledge Graph Construction Lifecycle}
@@ -75,20 +104,26 @@ To ensure modularity and extensibility, this translation algorithm formally adop
 \subsection{Phase 1: Knowledge Graph Creation (Base Graph Construction)}
 \label{subsec:phase1}
 
-In the Knowledge Graph Creation stage, the relevant information is extracted from the EA model to establish the initial semantic topology of the EAKG. Property definitions are registered first, followed by the creation and typing of element resources and the connection of those resources through relationship predicates. The base graph is grounded using \texttt{rdf:type} and \texttt{rdfs:subPropertyOf}, defining the ArchiMate entities present and preparing the graph for enrichment. The exact representation of each resource, relationship, and property is given in Section~\ref{sec:rules}.
-
-The canonical ArchiMate schema ontology is published at the persistent URL \texttt{http://purl.org/eakg/archimate}, which also serves as the Ontology IRI. The PURL redirects to the file's current hosting location, so identifiers stay stable even if the hosting changes. The methodology enforces a strict separation between \emph{static schema} (the published ontology, containing class hierarchies, relationship types, and schema-fixed attribute declarations) and \emph{dynamic output} (the translator, which emits only model-specific instance data such as per-relation predicates and user-defined properties).
+In the Knowledge Graph Creation stage, the relevant information is extracted from the EA model to create its RDF/EAKG representation. Property definitions are registered first, followed by the creation and typing of element resources and the connection of these resources through relationship predicates. The resulting graph is structured using \texttt{rdf:type} and \texttt{rdfs:subPropertyOf}, which define the types of ArchiMate entities and relationships represented in the graph based on our ontology. The exact representation of each resource, relationship, and property is given in \autoref{sec:rules}.
 
 \subsection{Phase 2: Knowledge Graph Enrichment (Semantic Layering)}
 \label{subsec:phase2}
 
-The Enrichment Phase expands the base graph with the semantic hierarchy and domain-specific analytical tags. It proceeds in two steps.
+The Enrichment Phase allows expanding the created graph with more information that can't be represented with ArchiMate concepts alone to give more value to EA model. Enrichment is performed by defining a specific ontology or reusing a predefined one to add additional resources and triples to the graph. This approach allows the resulting KG to be easily extended and customized according to user needs.
 
-First, the ArchiMate and EA smell ontologies are loaded into the triplestore directly via their persistent URLs (\texttt{http://purl.org/eakg/archimate} and \texttt{http://purl.org/eakg/smells}), alongside the translated model. This supplies the \texttt{rdfs:subClassOf} and \texttt{rdfs:subPropertyOf} hierarchy that the base graph does not contain---for example, connecting \texttt{archimate:BusinessActor} through \texttt{archimate:ActiveStructureElement} up to \texttt{archimate:BusinessLayer}. When an RDFS ruleset is active, the triplestore expands these hierarchies automatically. No offline merge script is needed.
+To demonstrate the enrichment phase, we propose the EA Smell Ontology, which defines seven types of EA smells and a predicate, \texttt{hasSmell}, used to associate affected resources with the corresponding smell types. The ontology is represented in \autoref{fig:smell-ontology}.
 
-Second, EA smells are detected and tagged via SPARQL. For each of the seven smells defined in the smell ontology, a detection \texttt{SELECT} query identifies the affected resources, and a tagging \texttt{INSERT} query materializes a \texttt{smells:hasSmell} triple on each one. The detection queries and their tagging counterparts are presented in Chapter~\ref{chap:queries}.
+EA smells are detected and tagged using SPARQL. For each of the seven smells defined in the ontology, a detection \texttt{SELECT} query identifies the affected resources, while a corresponding tagging \texttt{INSERT} query materializes a \texttt{smells} triple for each affected resource. The detection queries and their corresponding tagging queries are presented in \autoref{chap:queries}.
 
-This differs from the enrichment approach of \parencite{glaser2022model}, where computed graph metrics and EA smell labels are materialized by an external pipeline. Our approach performs enrichment directly in the triplestore via SPARQL updates, avoiding the need for a separate enrichment script. Structural graph analytics such as centrality scores remain a potential future extension.
+This differs from the enrichment approach of \parencite{glaser2022model}, where computed graph metrics and EA smell labels are materialized by an external pipeline. Our approach performs enrichment directly in the triplestore via SPARQL updates, avoiding the need for a separate enrichment script. Structural graph analytic such as centrality scores remain a potential future extension.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{smell-ontology.png
+}
+  \caption{Smell Ontology Representation}
+  \label{fig:smell-ontology}
+\end{figure}
 
 % ------------------------------------------------------------------
 \section{Core Translation Rules}
@@ -100,7 +135,7 @@ This differs from the enrichment approach of \parencite{glaser2022model}, where 
 In the Creation Phase, an ArchiMate element represents a distinct entity in the EAKG. Specifically, this targets a concrete element of the target ArchiMate model (e.g., a Business Actor or Application Service).
 
 \begin{itemize}
-    \item Each element identifier becomes an \texttt{owl:NamedIndividual}; the element is typed with its ArchiMate class and acts as an RDF subject or object. Names and documentation become multilingual \texttt{rdfs:label} and \texttt{rdfs:comment} triples.
+    \item Each element identifier becomes an \texttt{owl:NamedIndividual}; the element is typed with its ArchiMate classes (layer and aspect branch) and acts as an RDF subject or object. Names and documentation become multilingual \texttt{rdfs:label} and \texttt{rdfs:comment} triples.
 \end{itemize}
 
 \subsection{Rule 2: Relations (Edges)}
@@ -119,7 +154,7 @@ Abstract details of elements and relations are mapped to properties of the KG me
 
 \begin{itemize}
     \item A property key becomes an \texttt{owl:DatatypeProperty} with an XSD range and an \texttt{rdfs:subPropertyOf} link to \texttt{archimate:Property}, even when it has no assigned value. Values are emitted as direct subject--predicate--literal triples, so repeated values remain distinct objects without intermediate nodes.
-    \item \textbf{Schema-fixed attributes.} Certain relationship types carry semantic metadata as fixed XML attributes rather than \texttt{<property>} child elements---specifically \texttt{accessType} (on Access), \texttt{isDirected} (on Association), and \texttt{modifier} (on Influence). The schema declaration (type, range, super-property under \texttt{archimate:Property}) lives in the static ontology; concrete values are emitted by the translator.
+    \item \textbf{Schema-fixed attributes.} Certain relationship types carry semantic metadata as fixed XML attributes rather than \texttt{<property>} child elements---specifically \texttt{accessType} (on Access), \texttt{isDirected} (on Association), and \texttt{modifier} (on Influence). These properties are defined in the ArchiMate Ontology and concrete values are emitted by the translator.
 \end{itemize}
 
 \begin{lstlisting}[basicstyle=\small\ttfamily,
